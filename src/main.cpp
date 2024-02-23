@@ -1,18 +1,37 @@
 #include <Arduino.h>
+#include <M5Unified.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define WIDTH 80
+#define HEIGHT 160
+#define DELAY 500
+
+M5GFX display;
+M5Canvas canvas(&display);
+
+int count = 0;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  M5.begin();
+  display.init();
+
+  canvas.createSprite(10, 20);
+
+  display.fillScreen(BLACK);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-}
+  if (count % 2 == 0){
+    canvas.fillSprite(BLACK);
+  }
+  else{
+    canvas.fillSprite(BLUE);
+  }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  display.startWrite();
+  canvas.pushSprite(8, 8);
+  display.endWrite();
+
+  count++;
+  delay(DELAY);
 }
