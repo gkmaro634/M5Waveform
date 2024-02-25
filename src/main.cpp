@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <M5Unified.h>
 #include "M5Waveform.hpp"
+#include "time.h"
 
 #define WIDTH 135
 #define HEIGHT 240

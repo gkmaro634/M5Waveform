@@ -62,6 +62,17 @@ namespace m5wf
     _drwaYAxisPosLabel();
   }
 
+// RTC_TimeTypeDef TimeStruct;
+  void M5Waveform::add_value(float value)
+  {
+  // M5.Rtc.GetTime(&TimeStruct);
+  // auto dt = M5.Rtc.getDateTime();
+
+  // struct tm timeInfo;
+  // getLocalTime(&timeInfo);
+  // display.printf("%d\n", dt.time.seconds);
+  }
+
   void M5Waveform::_drawXAxisRulerLine(void)
   {
     for (int i = 0; i < _xAxisDivCount; i++)
@@ -94,6 +105,8 @@ namespace m5wf
   {
     switch (_selection)
     {
+    case NOT_EDIT:
+      break;
     case Y_DIV:
       figureCanvas->drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
       break;

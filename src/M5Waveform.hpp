@@ -24,7 +24,8 @@ namespace m5wf
   public:
     typedef enum
     {
-      Y_DIV = 1,
+      NOT_EDIT = 1,
+      Y_DIV,
       Y_POS,
       X_DIV
     } EditSelection;
@@ -38,6 +39,8 @@ namespace m5wf
     void init(int32_t width, int32_t height);
     void init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount);
 
+    void add_value(float value);
+
   private:
     /// @brief 波形領域全体の幅
     int32_t _figureWidth;
@@ -50,7 +53,7 @@ namespace m5wf
     uint16_t _waveRegionWidth;
     uint16_t _waveRegionHeight;
 
-    EditSelection _selection = Y_DIV;
+    EditSelection _selection = NOT_EDIT;
     uint8_t _yAxisDivCount = 1; // 0は分割無し, 1で二等分, 2,3,...255
     uint8_t _xAxisDivCount = 4; // 0は分割無し, 1で二等分, 2,3,...255
     uint16_t _yAxisDiv = 20;
