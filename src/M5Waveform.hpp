@@ -36,6 +36,7 @@ namespace m5wf
     M5Canvas *figureCanvas;
 
     void init(int32_t width, int32_t height);
+    void init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount);
 
   private:
     /// @brief 波形領域全体の幅

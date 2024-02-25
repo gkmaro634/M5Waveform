@@ -18,6 +18,14 @@ namespace m5wf
     // memo: 本クラス内でnewした領域などはここで解放する
   }
 
+  void M5Waveform::init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount)
+  {
+    _xAxisDivCount = xAxisDivCount;
+    _yAxisDivCount = yAxisDivCount;
+
+    M5Waveform::init(width, height);
+  }
+
   void M5Waveform::init(int32_t width, int32_t height)
   {
     _figureWidth = width;
@@ -25,8 +33,6 @@ namespace m5wf
 
     _waveRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
     _waveRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
-
-    // TODO: div分割数など受け取って変数に収める
 
     figureCanvas->createSprite(width, height);
     figureCanvas->setPivot(_figureWidth / 2, _figureHeight / 2);

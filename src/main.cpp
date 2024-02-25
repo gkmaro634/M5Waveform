@@ -29,7 +29,7 @@ void setup()
   Serial.println("Device initialized.");
 
   // 全体領域のうち波形に割り当てる領域サイズを指定する
-  waveform.init(chartWidth, chartHeight);
+  waveform.init(chartWidth, chartHeight, 4, 3);
 
   display.fillScreen(BLUE);
 }
