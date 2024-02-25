@@ -4,20 +4,6 @@ using namespace m5wf::figure_constants;
 
 namespace m5wf
 {
-  M5Waveform::M5Waveform()
-  {
-  }
-
-  M5Waveform::M5Waveform(M5Canvas *canvas)
-  {
-    figureCanvas = canvas;
-  }
-
-  M5Waveform::~M5Waveform()
-  {
-    // memo: 本クラス内でnewした領域などはここで解放する
-  }
-
   void M5Waveform::init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount)
   {
     _xAxisDivCount = xAxisDivCount;
@@ -34,12 +20,12 @@ namespace m5wf
     _waveRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
     _waveRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
 
-    figureCanvas->createSprite(width, height);
-    figureCanvas->setPivot(_figureWidth / 2, _figureHeight / 2);
-    figureCanvas->setColorDepth(8);
+    _canvas.createSprite(width, height);
+    _canvas.setPivot(_figureWidth / 2, _figureHeight / 2);
+    _canvas.setColorDepth(8);
 
     // DEBUG
-    figureCanvas->drawRect(
+    _canvas.drawRect(
         0,
         0,
         _figureWidth,
@@ -93,7 +79,7 @@ namespace m5wf
 
   void M5Waveform::_drawWaveformBorder(void)
   {
-    figureCanvas->drawRect(
+    _canvas.drawRect(
         _waveRegionX,
         _waveRegionY,
         _waveRegionWidth,
@@ -108,13 +94,13 @@ namespace m5wf
     case NOT_EDIT:
       break;
     case Y_DIV:
-      figureCanvas->drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
+      _canvas.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
       break;
     case Y_POS:
-      figureCanvas->drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLUE);
+      _canvas.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLUE);
       break;
     case X_DIV:
-      figureCanvas->drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
+      _canvas.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
       break;
     default:
       break;
@@ -123,22 +109,22 @@ namespace m5wf
 
   void M5Waveform::_drawYAxisDivLabel(void)
   {
-    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN);
-    figureCanvas->printf("%d", _yAxisDiv);
-    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN + LABEL_HEIGHT);
-    figureCanvas->printf("/div");
+    _canvas.setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN);
+    _canvas.printf("%d", _yAxisDiv);
+    _canvas.setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN + LABEL_HEIGHT);
+    _canvas.printf("/div");
   }
 
   void M5Waveform::_drwaYAxisPosLabel(void)
   {
-    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
-    figureCanvas->printf("%d", _yAxisPos);
+    _canvas.setCursor(MARGIN + MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
+    _canvas.printf("%d", _yAxisPos);
   }
 
   void M5Waveform::_drawXAxisDivLabel(void)
   {
-    figureCanvas->setCursor(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, _waveRegionY + _waveRegionHeight + MARGIN);
-    figureCanvas->printf("%d /div", _xAxisDiv);
+    _canvas.setCursor(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, _waveRegionY + _waveRegionHeight + MARGIN);
+    _canvas.printf("%d /div", _xAxisDiv);
   }
 
   void M5Waveform::_drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color)
@@ -153,7 +139,7 @@ namespace m5wf
     {
       if (i % 2 == 0)
       { // セグメントを描画
-        figureCanvas->drawLine(x, y, x + dx * segmentLength / (segmentLength + spaceLength), y + dy * segmentLength / (segmentLength + spaceLength), color);
+        _canvas.drawLine(x, y, x + dx * segmentLength / (segmentLength + spaceLength), y + dy * segmentLength / (segmentLength + spaceLength), color);
       }
       x += dx;
       y += dy;

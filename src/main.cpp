@@ -8,8 +8,7 @@
 #define DELAY 1000
 
 M5GFX display;
-M5Canvas canvas(&display);
-m5wf::M5Waveform waveform(&canvas);
+m5wf::M5Waveform waveform(&display);
 
 int count = 0;
 
