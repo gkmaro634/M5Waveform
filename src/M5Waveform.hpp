@@ -30,9 +30,13 @@ namespace m5wf
       X_DIV
     } EditSelection;
 
-    M5Waveform(){}
-    M5Waveform(M5GFX *display) : _display(display), _canvas(display) { figureCanvas = &_canvas; }
-    ~M5Waveform(){ _canvas.deleteSprite(); }
+    M5Waveform() {}
+    M5Waveform(M5GFX *display) : _display(display), _canvas(display), _waveSprite(display) { figureCanvas = &_canvas; }
+    ~M5Waveform()
+    {
+      _waveSprite.deleteSprite();
+      _canvas.deleteSprite();
+    }
 
     M5Canvas *figureCanvas;
 
@@ -44,6 +48,7 @@ namespace m5wf
   private:
     M5GFX *_display;
     M5Canvas _canvas;
+    M5Canvas _waveSprite;
 
     /// @brief 波形領域全体の幅
     int32_t _figureWidth;

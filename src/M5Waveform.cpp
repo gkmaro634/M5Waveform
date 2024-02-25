@@ -23,6 +23,9 @@ namespace m5wf
     _canvas.createSprite(width, height);
     _canvas.setPivot(_figureWidth / 2, _figureHeight / 2);
     _canvas.setColorDepth(8);
+    
+    _waveSprite.createSprite(_waveRegionWidth, _waveRegionHeight);
+    _waveSprite.setColorDepth(8);
 
     // DEBUG
     _canvas.drawRect(
@@ -46,6 +49,12 @@ namespace m5wf
     _drawXAxisDivLabel();
     _drawYAxisDivLabel();
     _drwaYAxisPosLabel();
+
+    // ダミー波形
+    _waveSprite.drawLine(0, 20, 10, 40, WHITE);
+    _waveSprite.drawLine(10, 40, 20, 30, WHITE);
+
+    _waveSprite.pushSprite(&_canvas, (int32_t)_waveRegionX, (int32_t)_waveRegionY, BLACK);
   }
 
 // RTC_TimeTypeDef TimeStruct;
