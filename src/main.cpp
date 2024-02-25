@@ -29,8 +29,6 @@ void setup()
   Serial.println("Device initialized.");
 
   // 全体領域のうち波形に割り当てる領域サイズを指定する
-  // waveform = m5wf::M5Waveform(canvas);
-  // canvas.createSprite(chartWidth, chartHeight);
   waveform.init(chartWidth, chartHeight);
 
   display.fillScreen(BLUE);

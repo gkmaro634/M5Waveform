@@ -23,7 +23,13 @@ namespace m5wf
     _figureWidth = width;
     _figureHeight = height;
 
+    _waveRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
+    _waveRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
+
+    // TODO: div分割数など受け取って変数に収める
+
     figureCanvas->createSprite(width, height);
+    figureCanvas->setPivot(_figureWidth / 2, _figureHeight / 2);
     figureCanvas->setColorDepth(8);
 
     // DEBUG
@@ -34,70 +40,86 @@ namespace m5wf
         _figureHeight,
         WHITE);
 
-    // 不変の部品を描画する
-    auto waveRegionX = MARGIN + YAXIS_DIV_LABLE_WIDTH;
-    auto waveRegionY = MARGIN;
-    auto waveRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
-    auto waveRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
-
     // 分割点線
-    // X div
-    for (int i = 0; i < _xAxisDivCount; i++)
-    {
-      auto xPos = waveRegionWidth / (_xAxisDivCount + 1) * (i + 1) + waveRegionX;
-      _drawDashedLine(xPos, waveRegionY, xPos, waveRegionY + waveRegionHeight, 6, 2, BLUE);
-    }
-    // Y div
-    for (int i = 0; i < _yAxisDivCount; i++)
-    {
-      auto yPos = waveRegionHeight / (_yAxisDivCount + 1) * (i + 1) + waveRegionY;
-      _drawDashedLine(waveRegionX, yPos, waveRegionX + waveRegionWidth, yPos, 6, 2, BLUE);
-    }
+    _drawXAxisRulerLine();
+    _drawYAxisRulerLine();
 
     // 枠
-    figureCanvas->drawRect(
-        waveRegionX,
-        waveRegionY,
-        waveRegionWidth,
-        waveRegionHeight,
-        BLUE);
+    _drawWaveformBorder();
 
     // 選択枠
+    _drawParamEditBorder();
+
+    // 軸ラベル
+    _drawXAxisDivLabel();
+    _drawYAxisDivLabel();
+    _drwaYAxisPosLabel();
+  }
+
+  void M5Waveform::_drawXAxisRulerLine(void)
+  {
+    for (int i = 0; i < _xAxisDivCount; i++)
+    {
+      auto xPos = _waveRegionWidth / (_xAxisDivCount + 1) * (i + 1) + _waveRegionX;
+      _drawDashedLine(xPos, _waveRegionY, xPos, _waveRegionY + _waveRegionHeight, 6, 2, BLUE);
+    }
+  }
+
+  void M5Waveform::_drawYAxisRulerLine(void)
+  {
+    for (int i = 0; i < _yAxisDivCount; i++)
+    {
+      auto yPos = _waveRegionHeight / (_yAxisDivCount + 1) * (i + 1) + _waveRegionY;
+      _drawDashedLine(_waveRegionX, yPos, _waveRegionX + _waveRegionWidth, yPos, 6, 2, BLUE);
+    }
+  }
+
+  void M5Waveform::_drawWaveformBorder(void)
+  {
+    figureCanvas->drawRect(
+        _waveRegionX,
+        _waveRegionY,
+        _waveRegionWidth,
+        _waveRegionHeight,
+        BLUE);
+  }
+
+  void M5Waveform::_drawParamEditBorder(void)
+  {
     switch (_selection)
     {
     case Y_DIV:
-      /* code */
-      figureCanvas->drawRect(MARGIN, waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
+      figureCanvas->drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
       break;
     case Y_POS:
-      /* code */
-      figureCanvas->drawRect(MARGIN, waveRegionY + waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLUE);
+      figureCanvas->drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLUE);
       break;
     case X_DIV:
-      /* code */
-      figureCanvas->drawRect(waveRegionX + waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, waveRegionY + waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
+      figureCanvas->drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
       break;
     default:
       break;
     }
+  }
 
-    // 軸ラベル
-    // Y div
-    figureCanvas->setCursor(MARGIN + MARGIN, waveRegionY + MARGIN);
+  void M5Waveform::_drawYAxisDivLabel(void)
+  {
+    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN);
     figureCanvas->printf("%d", _yAxisDiv);
-    figureCanvas->setCursor(MARGIN + MARGIN, waveRegionY + MARGIN + LABEL_HEIGHT);
+    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN + LABEL_HEIGHT);
     figureCanvas->printf("/div");
+  }
 
-    // Y pos
-    figureCanvas->setCursor(MARGIN + MARGIN, waveRegionY + waveRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
+  void M5Waveform::_drwaYAxisPosLabel(void)
+  {
+    figureCanvas->setCursor(MARGIN + MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
     figureCanvas->printf("%d", _yAxisPos);
+  }
 
-    // X div
-    figureCanvas->setCursor(waveRegionX + waveRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, waveRegionY + waveRegionHeight + MARGIN);
+  void M5Waveform::_drawXAxisDivLabel(void)
+  {
+    figureCanvas->setCursor(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, _waveRegionY + _waveRegionHeight + MARGIN);
     figureCanvas->printf("%d /div", _xAxisDiv);
-
-    // 描画設定
-    figureCanvas->setPivot(_figureWidth / 2, _figureHeight / 2);    
   }
 
   void M5Waveform::_drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color)

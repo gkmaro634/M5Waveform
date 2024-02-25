@@ -20,6 +20,7 @@ namespace m5wf
 
   class M5Waveform
   {
+
   public:
     typedef enum
     {
@@ -29,10 +30,10 @@ namespace m5wf
     } EditSelection;
 
     M5Waveform();
-    M5Waveform(M5Canvas* canvas);
+    M5Waveform(M5Canvas *canvas);
     ~M5Waveform();
 
-    M5Canvas* figureCanvas;
+    M5Canvas *figureCanvas;
 
     void init(int32_t width, int32_t height);
 
@@ -42,6 +43,12 @@ namespace m5wf
     /// @brief 波形領域全体の高さ
     int32_t _figureHeight;
 
+    uint16_t _waveRegionX = m5wf::figure_constants::MARGIN + m5wf::figure_constants::YAXIS_DIV_LABLE_WIDTH;
+    uint16_t _waveRegionY = m5wf::figure_constants::MARGIN;
+
+    uint16_t _waveRegionWidth;
+    uint16_t _waveRegionHeight;
+
     EditSelection _selection = Y_DIV;
     uint8_t _yAxisDivCount = 1; // 0は分割無し, 1で二等分, 2,3,...255
     uint8_t _xAxisDivCount = 4; // 0は分割無し, 1で二等分, 2,3,...255
@@ -49,6 +56,13 @@ namespace m5wf
     uint16_t _yAxisPos = 100;
     uint16_t _xAxisDiv = 50;
 
+    void _drawXAxisRulerLine(void);
+    void _drawYAxisRulerLine(void);
+    void _drawWaveformBorder(void);
+    void _drawParamEditBorder(void);
+    void _drawYAxisDivLabel(void);
+    void _drwaYAxisPosLabel(void);
+    void _drawXAxisDivLabel(void);
     void _drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color);
   };
 }
