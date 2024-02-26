@@ -125,6 +125,28 @@ namespace m5wf
     _renderFigure();
   }
 
+  void M5Waveform::setEditState(EditState state)
+  {
+    _clearCanvas();
+
+    _editState = state;
+    _drawParamEditBorder();
+
+    _renderFigure();
+    _renderWaveform();
+  }
+  
+  void M5Waveform::setEditTarget(EditTarget target)
+  {
+    _clearCanvas();
+
+    _editTarget = target;
+    _drawParamEditBorder();
+
+    _renderFigure();
+    _renderWaveform();
+  }
+
   void M5Waveform::_renderFigure(void)
   {
     _figureSprite.pushSprite(&_canvas, 0, 0, BLACK);
@@ -214,21 +236,21 @@ namespace m5wf
 
   void M5Waveform::_drawParamEditBorder(void)
   {
-    switch (_selection)
+    int borderColor = _editState == NOT_EDIT ? BLACK : _editState == SELECT ? BLUE : RED;
+
+    switch (_editTarget)
     {
-    case NOT_EDIT:
-      break;
     case Y_DIV:
-      _figureSprite.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLUE);
+      _figureSprite.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     case Y_POS:
-      _figureSprite.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLUE);
+      _figureSprite.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, borderColor);
       break;
     case X_DIV:
-      _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
+      _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     case X_POS:
-      _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLUE);
+      _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     default:
       break;

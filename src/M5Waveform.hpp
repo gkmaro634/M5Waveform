@@ -24,12 +24,18 @@ namespace m5wf
   public:
     typedef enum
     {
-      NOT_EDIT = 1,
-      X_DIV,
+      X_DIV = 1,
       X_POS,
       Y_DIV,
       Y_POS,
-    } EditSelection;
+    } EditTarget;
+
+    typedef enum
+    {
+      NOT_EDIT = 1,
+      SELECT,
+      EDIT,
+    } EditState;
 
     typedef struct 
     {
@@ -56,11 +62,17 @@ namespace m5wf
     void updateYAxisDiv(uint16_t value);
     void updateYAxisPos(uint16_t value);
 
+    void setEditState(M5Waveform::EditState state);
+    void setEditTarget(M5Waveform::EditTarget target);
+
   private:
     M5GFX *_display;
     M5Canvas _canvas;
     M5Canvas _waveSprite;
     M5Canvas _figureSprite;
+
+    M5Waveform::EditTarget _editTarget = Y_DIV;
+    M5Waveform::EditState _editState = NOT_EDIT;
 
     /// @brief 波形領域全体の幅
     int32_t _figureWidth;
@@ -73,11 +85,10 @@ namespace m5wf
     uint16_t _waveRegionWidth;
     uint16_t _waveRegionHeight;
 
-    EditSelection _selection = NOT_EDIT;
     uint8_t _xAxisDivCount = 4; // 0は分割無し, 1で二等分, 2,3,...255
     uint8_t _yAxisDivCount = 3; // 0は分割無し, 1で二等分, 2,3,...255
     uint16_t _xAxisDiv = 40;
-    uint16_t _xAxisPos = 5;
+    uint16_t _xAxisPos = 0;
     uint16_t _yAxisDiv = 20;
     uint16_t _yAxisPos = 0;
 

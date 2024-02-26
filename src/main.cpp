@@ -23,6 +23,9 @@ int32_t chartHeight = 96;
 
 m5wf::M5Waveform::point_f points[8];
 
+// m5wf::M5Waveform::EditState editState = m5wf::M5Waveform::NOT_EDIT;
+// m5wf::M5Waveform::EditTarget editTarget = m5wf::M5Waveform::X_DIV;
+
 void setup()
 {
   M5.begin();
@@ -37,27 +40,34 @@ void setup()
 
   for (int i = 0; i < 8; i++)
   {
+    int rand = (100 * i) % 41;
     points[i].x = (float)i * 20.0; // + 40.0;
-    points[i].y = (float)i * 5.0;  // + 120.0;
+    points[i].y = (float)rand;  // + 120.0;
   }
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  if (count % 2 == 0)
+  if (count % 3 == 0)
   {
+    waveform.setEditState(m5wf::M5Waveform::NOT_EDIT);
     // waveform.updateXAxisDiv(20);
     // waveform.updateXAxisPos(20);
     // waveform.updateYAxisDiv(20);
-    waveform.updateYAxisPos(20);
+    // waveform.updateYAxisPos(20);
+  }
+  else if(count % 3 == 1)
+  {
+    waveform.setEditState(m5wf::M5Waveform::SELECT);
   }
   else
   {
+    waveform.setEditState(m5wf::M5Waveform::EDIT);
     // waveform.updateXAxisDiv(30);
     // waveform.updateXAxisPos(30);
     // waveform.updateYAxisDiv(30);
-    waveform.updateYAxisPos(30);
+    // waveform.updateYAxisPos(30);
   }
 
   display.startWrite();
