@@ -25,7 +25,7 @@ namespace m5wf
     _canvas.setColorDepth(8);
 
     _waveSprite.createSprite(_waveRegionWidth, _waveRegionHeight);
-    _waveSprite.setPivot(_waveRegionWidth / 2, _waveRegionHeight / 2);
+    // _waveSprite.setPivot(_waveRegionWidth / 2, _waveRegionHeight / 2);
     _waveSprite.setColorDepth(8);
 
     // DEBUG
@@ -58,7 +58,7 @@ namespace m5wf
     _waveSprite.fillScreen(BLACK);
 
     // point
-    uint16_t x_pt, y_pt;
+    int x_pt, y_pt;
     for (int i = 0; i < length; i++)
     {
       auto p = points[i];
@@ -69,11 +69,24 @@ namespace m5wf
     }
 
     // line
-    // for (int i = 1; i < length; i++)
-    // {
-    //   auto p1 = points[(i - 1) * sizeof(point_f)];
-    //   auto p2 = points[i * sizeof(point_f)];
-    // }
+    int x1_pt, y1_pt;
+    int x2_pt, y2_pt;
+    uint8_t ret1, ret2;
+    for (int i = 1; i < length; i++)
+    {
+      auto p1 = points[i - 1];
+      auto p2 = points[i];
+      ret1 = _point2px(p1, &x1_pt, &y1_pt);
+      ret2 = _point2px(p2, &x2_pt, &y2_pt);
+
+      // 両方範囲外
+      if (ret1 != 0 && ret2 != 0)
+      {
+        continue;
+      }
+
+      _waveSprite.drawLine(x1_pt, y1_pt, x2_pt, y2_pt, WHITE);
+    }
 
     _waveSprite.pushSprite(&_canvas, (int32_t)_waveRegionX, (int32_t)_waveRegionY, BLACK);
   }
@@ -89,24 +102,25 @@ namespace m5wf
   // // display.printf("%d\n", dt.time.seconds);
   // }
 
-  uint8_t M5Waveform::_point2px(point_f point, uint16_t *x_px, uint16_t *y_px)
+  uint8_t M5Waveform::_point2px(point_f point, int *x_px, int *y_px)
   {
     float xStart = (float)_xAxisPos;
     float xEnd = (float)_xAxisPos + (float)_xAxisDiv * ((float)_xAxisDivCount + (float)1);
     float yStart = (float)_yAxisPos;
     float yEnd = (float)_yAxisPos + (float)_yAxisDiv * ((float)_yAxisDivCount + (float)1);
+    uint8_t ret = 0;
 
     if (point.x < xStart || xEnd < point.x || point.y < yStart || yEnd < point.y)
     {
-      return 1;
+      ret = 1;
     }
 
     float dx = (float)_waveRegionWidth / (xEnd - xStart);
     float dy = (float)_waveRegionHeight / (yEnd - yStart);
-    *x_px = (uint16_t)((point.x - xStart) * dx);
-    *y_px = (uint16_t)(_waveRegionHeight - (point.y - yStart) * dy);
+    *x_px = (int)((point.x - xStart) * dx);
+    *y_px = (int)(_waveRegionHeight - (point.y - yStart) * dy);
 
-    return 0;
+    return ret;
   }
 
   void M5Waveform::_drawXAxisRulerLine(void)

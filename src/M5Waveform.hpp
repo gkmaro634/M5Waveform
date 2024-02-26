@@ -72,7 +72,7 @@ namespace m5wf
     uint8_t _xAxisDivCount = 4; // 0は分割無し, 1で二等分, 2,3,...255
     uint8_t _yAxisDivCount = 3; // 0は分割無し, 1で二等分, 2,3,...255
     uint16_t _xAxisDiv = 40;
-    uint16_t _xAxisPos = 0;
+    uint16_t _xAxisPos = 5;
     uint16_t _yAxisDiv = 20;
     uint16_t _yAxisPos = 0;
 
@@ -84,7 +84,7 @@ namespace m5wf
     void _drawXAxisPosLabel(void);
     void _drawYAxisDivLabel(void);
     void _drawYAxisPosLabel(void);
-    uint8_t _point2px(point_f point, uint16_t* x_px, uint16_t* y_px);
+    uint8_t _point2px(point_f point, int* x_px, int* y_px);
     void _drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color);
   };
 }
