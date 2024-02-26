@@ -51,11 +51,16 @@ namespace m5wf
     void init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount);
 
     void drawWaveform(point_f *points, uint16_t length);
+    void updateXAxisDiv(uint16_t value);
+    void updateXAxisPos(uint16_t value);
+    void updateYAxisDiv(uint16_t value);
+    void updateYAxisPos(uint16_t value);
 
   private:
     M5GFX *_display;
     M5Canvas _canvas;
     M5Canvas _waveSprite;
+    M5Canvas _figureSprite;
 
     /// @brief 波形領域全体の幅
     int32_t _figureWidth;
@@ -75,6 +80,13 @@ namespace m5wf
     uint16_t _xAxisPos = 5;
     uint16_t _yAxisDiv = 20;
     uint16_t _yAxisPos = 0;
+
+    void _renderFigure(void);
+    void _renderWaveform(void);
+
+    void _clearCanvas(void);
+    void _clearFigure(void);
+    void _clearWaveform(void);
 
     void _drawXAxisRulerLine(void);
     void _drawYAxisRulerLine(void);

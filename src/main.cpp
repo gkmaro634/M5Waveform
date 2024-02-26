@@ -5,7 +5,7 @@
 
 #define WIDTH 135
 #define HEIGHT 240
-#define DELAY 1000
+#define DELAY 3000
 
 M5GFX display;
 m5wf::M5Waveform waveform(&display);
@@ -35,26 +35,34 @@ void setup()
 
   display.fillScreen(BLACK);
 
-  for (int i = 0; i < 8; i++){
-    points[i].x = (float)i * 20.0;// + 40.0;
-    points[i].y = (float)i * 5.0;// + 120.0;
+  for (int i = 0; i < 8; i++)
+  {
+    points[i].x = (float)i * 20.0; // + 40.0;
+    points[i].y = (float)i * 5.0;  // + 120.0;
   }
-
-  waveform.drawWaveform(points, 8);
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  // if (count % 2 == 0){
-  //   canvas.fillSprite(BLACK);
-  // }
-  // else{
-  //   canvas.fillSprite(BLUE);
-  // }
+  if (count % 2 == 0)
+  {
+    // waveform.updateXAxisDiv(20);
+    // waveform.updateXAxisPos(20);
+    // waveform.updateYAxisDiv(20);
+    waveform.updateYAxisPos(20);
+  }
+  else
+  {
+    // waveform.updateXAxisDiv(30);
+    // waveform.updateXAxisPos(30);
+    // waveform.updateYAxisDiv(30);
+    waveform.updateYAxisPos(30);
+  }
 
   display.startWrite();
 
+  waveform.drawWaveform(points, 8);
   waveform.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1); // pushSprite(8, 8);
 
   display.endWrite();
