@@ -30,14 +30,6 @@ namespace m5wf
     _figureSprite.createSprite(_figureWidth, _figureHeight);
     _figureSprite.setColorDepth(8);
 
-    // DEBUG
-    // _figureSprite.drawRect(
-    //     0,
-    //     0,
-    //     _figureWidth,
-    //     _figureHeight,
-    //     WHITE);
-
     // 分割点線
     _drawXAxisRulerLine();
     _drawYAxisRulerLine();
@@ -57,44 +49,55 @@ namespace m5wf
     _renderFigure();
   }
 
-  void M5Waveform::drawWaveform(point_f *points, uint16_t length)
+  void M5Waveform::drawWaveform(point_f *points, uint16_t length, PlotType plotType)
   {
     _clearCanvas();
     _clearWaveform();
 
     // point
-    int x_pt, y_pt;
-    for (int i = 0; i < length; i++)
+    if (plotType == LINE_MARKER || plotType == MARKER)
     {
-      auto p = points[i];
-      if (_point2px(p, &x_pt, &y_pt) == 0)
+      int x_pt, y_pt;
+      for (int i = 0; i < length; i++)
       {
-        _waveSprite.fillCircle(x_pt, y_pt, 2, WHITE);
+        auto p = points[i];
+        if (_point2px(p, &x_pt, &y_pt) == 0)
+        {
+          _waveSprite.fillCircle(x_pt, y_pt, 2, GREEN);
+        }
       }
     }
 
     // line
-    int x1_pt, y1_pt;
-    int x2_pt, y2_pt;
-    uint8_t ret1, ret2;
-    for (int i = 1; i < length; i++)
+    if (plotType == LINE_MARKER || plotType == LINE)
     {
-      auto p1 = points[i - 1];
-      auto p2 = points[i];
-      ret1 = _point2px(p1, &x1_pt, &y1_pt);
-      ret2 = _point2px(p2, &x2_pt, &y2_pt);
-
-      // 両方範囲外
-      if (ret1 != 0 && ret2 != 0)
+      int x1_pt, y1_pt;
+      int x2_pt, y2_pt;
+      uint8_t ret1, ret2;
+      for (int i = 1; i < length; i++)
       {
-        continue;
-      }
+        auto p1 = points[i - 1];
+        auto p2 = points[i];
+        ret1 = _point2px(p1, &x1_pt, &y1_pt);
+        ret2 = _point2px(p2, &x2_pt, &y2_pt);
 
-      _waveSprite.drawLine(x1_pt, y1_pt, x2_pt, y2_pt, WHITE);
+        // 両方範囲外
+        if (ret1 != 0 && ret2 != 0)
+        {
+          continue;
+        }
+
+        _waveSprite.drawLine(x1_pt, y1_pt, x2_pt, y2_pt, GREEN);
+      }
     }
 
     _renderFigure();
     _renderWaveform();
+  }
+
+  void M5Waveform::drawWaveform(point_f *points, uint16_t length)
+  {
+    drawWaveform(points, length, LINE_MARKER);
   }
 
   void M5Waveform::updateXAxisDiv(uint16_t value)
@@ -135,7 +138,7 @@ namespace m5wf
     _renderFigure();
     _renderWaveform();
   }
-  
+
   void M5Waveform::setEditTarget(EditTarget target)
   {
     _clearCanvas();
@@ -172,17 +175,6 @@ namespace m5wf
     _figureSprite.fillScreen(BLACK);
   }
 
-  // RTC_TimeTypeDef TimeStruct;
-  // void M5Waveform::add_value(float value)
-  // {
-  // // M5.Rtc.GetTime(&TimeStruct);
-  // // auto dt = M5.Rtc.getDateTime();
-
-  // // struct tm timeInfo;
-  // // getLocalTime(&timeInfo);
-  // // display.printf("%d\n", dt.time.seconds);
-  // }
-
   uint8_t M5Waveform::_point2px(point_f point, int *x_px, int *y_px)
   {
     float xStart = (float)_xAxisPos;
@@ -210,7 +202,7 @@ namespace m5wf
     for (int i = 0; i < _xAxisDivCount; i++)
     {
       float xPos = step * (i + 1) + _waveRegionX;
-      _drawDashedLine((int)xPos, _waveRegionY, (int)xPos, _waveRegionY + _waveRegionHeight, 6, 2, BLUE);
+      _drawDashedLine((int)xPos, _waveRegionY, (int)xPos, _waveRegionY + _waveRegionHeight, 6, 2, DARKGREEN);
     }
   }
 
@@ -220,7 +212,7 @@ namespace m5wf
     for (int i = 0; i < _yAxisDivCount; i++)
     {
       float yPos = step * (i + 1) + _waveRegionY;
-      _drawDashedLine(_waveRegionX, (int)yPos, _waveRegionX + _waveRegionWidth, (int)yPos, 6, 2, BLUE);
+      _drawDashedLine(_waveRegionX, (int)yPos, _waveRegionX + _waveRegionWidth, (int)yPos, 6, 2, DARKGREEN);
     }
   }
 
@@ -231,12 +223,34 @@ namespace m5wf
         _waveRegionY,
         _waveRegionWidth,
         _waveRegionHeight,
-        BLUE);
+        DARKGREEN);
   }
 
   void M5Waveform::_drawParamEditBorder(void)
   {
-    int borderColor = _editState == NOT_EDIT ? BLACK : _editState == SELECT ? BLUE : RED;
+    _figureSprite.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, BLACK);
+
+    if (_editState == NOT_EDIT)
+    {
+      return;
+    }
+
+    int borderColor;
+    switch (_editState)
+    {
+    case SELECT:
+      borderColor = DARKGREEN;
+      break;
+    case EDIT:
+      borderColor = RED;
+      break;
+    default:
+      borderColor = BLACK;
+      break;
+    }
 
     switch (_editTarget)
     {
@@ -250,7 +264,7 @@ namespace m5wf
       _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     case X_POS:
-      _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
+      _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, borderColor);
       break;
     default:
       break;
@@ -294,7 +308,8 @@ namespace m5wf
     for (int i = 0; i < dashCount; i++)
     {
       if (i % 2 == 0)
-      { // セグメントを描画
+      {
+        // セグメントを描画
         _figureSprite.drawLine(x, y, x + dx * segmentLength / (segmentLength + spaceLength), y + dy * segmentLength / (segmentLength + spaceLength), color);
       }
       x += dx;

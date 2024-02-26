@@ -16,6 +16,8 @@ namespace m5wf
     static constexpr int YAXIS_POS_LABLE_HEIGHT = LABEL_HEIGHT;
     static constexpr int XAXIS_DIV_LABLE_WIDTH = 80;
     static constexpr int XAXIS_DIV_LABLE_HEIGHT = LABEL_HEIGHT;
+    static constexpr int XAXIS_POS_LABLE_WIDTH = 40;
+    static constexpr int XAXIS_POS_LABLE_HEIGHT = LABEL_HEIGHT;
   }
 
   class M5Waveform
@@ -37,6 +39,13 @@ namespace m5wf
       EDIT,
     } EditState;
 
+    typedef enum
+    {
+      LINE = 1,
+      MARKER,
+      LINE_MARKER
+    } PlotType;
+
     typedef struct 
     {
       float x;
@@ -44,10 +53,11 @@ namespace m5wf
     } point_f;
 
     M5Waveform() {}
-    M5Waveform(M5GFX *display) : _display(display), _canvas(display), _waveSprite(display) { figureCanvas = &_canvas; }
+    M5Waveform(M5GFX *display) : _display(display), _canvas(display), _waveSprite(display), _figureSprite(display) { figureCanvas = &_canvas; }
     ~M5Waveform()
     {
       _waveSprite.deleteSprite();
+      _figureSprite.deleteSprite();
       _canvas.deleteSprite();
     }
 
@@ -57,6 +67,7 @@ namespace m5wf
     void init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount);
 
     void drawWaveform(point_f *points, uint16_t length);
+    void drawWaveform(point_f *points, uint16_t length, PlotType plotType);
     void updateXAxisDiv(uint16_t value);
     void updateXAxisPos(uint16_t value);
     void updateYAxisDiv(uint16_t value);
