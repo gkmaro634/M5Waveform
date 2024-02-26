@@ -28,6 +28,7 @@ void setup()
 
   display.fillScreen(BLACK);
 
+  // ダミーの点群を生成
   for (int i = 0; i < 8; i++)
   {
     int rand = (100 * i) % 41;
@@ -38,6 +39,7 @@ void setup()
 
 void loop()
 {
+  // 軸設定対象切り替えの模擬
   if ((count / 4) % 4 == 0)
   {
     waveform.setEditTarget(m5wf::M5Waveform::Y_DIV);
@@ -52,6 +54,7 @@ void loop()
     waveform.setEditTarget(m5wf::M5Waveform::X_DIV);
   }
 
+  // 軸設定状態切り替えの模擬
   if (count % 3 == 0)
   {
     waveform.setEditState(m5wf::M5Waveform::NOT_EDIT);
@@ -75,6 +78,7 @@ void loop()
 
   display.startWrite();
 
+  // 波形描画更新処理
   waveform.drawWaveform(points, 8, m5wf::M5Waveform::LINE);
   waveform.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
