@@ -25,10 +25,17 @@ namespace m5wf
     typedef enum
     {
       NOT_EDIT = 1,
+      X_DIV,
+      X_POS,
       Y_DIV,
       Y_POS,
-      X_DIV
     } EditSelection;
+
+    typedef struct 
+    {
+      float x;
+      float y;
+    } point_f;
 
     M5Waveform() {}
     M5Waveform(M5GFX *display) : _display(display), _canvas(display), _waveSprite(display) { figureCanvas = &_canvas; }
@@ -43,7 +50,7 @@ namespace m5wf
     void init(int32_t width, int32_t height);
     void init(int32_t width, int32_t height, uint8_t xAxisDivCount, uint8_t yAxisDivCount);
 
-    void add_value(float value);
+    void drawWaveform(point_f *points, uint16_t length);
 
   private:
     M5GFX *_display;
@@ -62,19 +69,22 @@ namespace m5wf
     uint16_t _waveRegionHeight;
 
     EditSelection _selection = NOT_EDIT;
-    uint8_t _yAxisDivCount = 1; // 0は分割無し, 1で二等分, 2,3,...255
     uint8_t _xAxisDivCount = 4; // 0は分割無し, 1で二等分, 2,3,...255
+    uint8_t _yAxisDivCount = 3; // 0は分割無し, 1で二等分, 2,3,...255
+    uint16_t _xAxisDiv = 40;
+    uint16_t _xAxisPos = 0;
     uint16_t _yAxisDiv = 20;
-    uint16_t _yAxisPos = 100;
-    uint16_t _xAxisDiv = 50;
+    uint16_t _yAxisPos = 0;
 
     void _drawXAxisRulerLine(void);
     void _drawYAxisRulerLine(void);
     void _drawWaveformBorder(void);
     void _drawParamEditBorder(void);
-    void _drawYAxisDivLabel(void);
-    void _drwaYAxisPosLabel(void);
     void _drawXAxisDivLabel(void);
+    void _drawXAxisPosLabel(void);
+    void _drawYAxisDivLabel(void);
+    void _drawYAxisPosLabel(void);
+    uint8_t _point2px(point_f point, uint16_t* x_px, uint16_t* y_px);
     void _drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color);
   };
 }

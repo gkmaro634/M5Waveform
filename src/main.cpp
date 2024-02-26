@@ -21,6 +21,8 @@ int count = 0;
 int32_t chartWidth = 200;
 int32_t chartHeight = 96;
 
+m5wf::M5Waveform::point_f points[8];
+
 void setup()
 {
   M5.begin();
@@ -31,7 +33,14 @@ void setup()
   // 全体領域のうち波形に割り当てる領域サイズを指定する
   waveform.init(chartWidth, chartHeight, 4, 3);
 
-  display.fillScreen(BLUE);
+  display.fillScreen(BLACK);
+
+  for (int i = 0; i < 8; i++){
+    points[i].x = (float)i * 20.0;// + 40.0;
+    points[i].y = (float)i * 5.0;// + 120.0;
+  }
+
+  waveform.drawWaveform(points, 8);
 }
 
 void loop()
