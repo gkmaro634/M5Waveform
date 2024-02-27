@@ -1,0 +1,29 @@
+{
+    "name": "M5Waveform",
+    "version": "0.0.1",
+    "description": "A library for drawing waveforms on the M5Stack.",
+    "keywords": "waveform, plot, figure, chart, wave, visualize",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/gkmaro634/M5Waveform.git"
+    },
+    "authors":
+    [
+      {
+        "name": "K. Goto",
+        "email": "oosotokara.kgoto@gmail.com",
+        "url": "https://github.com/gkmaro634",
+        "maintainer": true
+      }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/gkmaro634/M5Waveform",
+    "dependencies": {
+        "name": "M5Unified",
+        "version": ">=0.1.12"
+      },
+    "frameworks": ["arduino"],
+    "platforms": ["espressif32"],
+    "headers": "M5WAveform.hpp"
+  }
