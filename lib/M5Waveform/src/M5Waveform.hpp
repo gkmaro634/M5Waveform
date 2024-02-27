@@ -123,4 +123,6 @@ namespace m5wf
   };
 }
 
+using M5Waveform = m5wf::M5Waveform;
+
 #endif
