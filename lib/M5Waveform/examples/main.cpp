@@ -7,14 +7,14 @@
 #define DELAY 3000
 
 M5GFX display;
-m5wf::M5Waveform waveform(&display);
+M5Waveform waveform(&display);
 
 int count = 0;
 
 int32_t chartWidth = 200;
 int32_t chartHeight = 96;
 
-m5wf::M5Waveform::point_f points[8];
+M5Waveform::point_f points[8];
 
 void setup()
 {
@@ -42,22 +42,22 @@ void loop()
   // 軸設定対象切り替えの模擬
   if ((count / 4) % 4 == 0)
   {
-    waveform.setEditTarget(m5wf::M5Waveform::Y_DIV);
+    waveform.setEditTarget(M5Waveform::Y_DIV);
   }
   else if ((count / 4) % 4 == 1){
-    waveform.setEditTarget(m5wf::M5Waveform::Y_POS);
+    waveform.setEditTarget(M5Waveform::Y_POS);
   }
   else if ((count / 4) % 4 == 2){
-    waveform.setEditTarget(m5wf::M5Waveform::X_POS);
+    waveform.setEditTarget(M5Waveform::X_POS);
   }
   else if ((count / 4) % 4 == 3){
-    waveform.setEditTarget(m5wf::M5Waveform::X_DIV);
+    waveform.setEditTarget(M5Waveform::X_DIV);
   }
 
   // 軸設定状態切り替えの模擬
   if (count % 3 == 0)
   {
-    waveform.setEditState(m5wf::M5Waveform::NOT_EDIT);
+    waveform.setEditState(M5Waveform::NOT_EDIT);
     // waveform.updateXAxisDiv(20);
     // waveform.updateXAxisPos(20);
     // waveform.updateYAxisDiv(20);
@@ -65,11 +65,11 @@ void loop()
   }
   else if(count % 3 == 1)
   {
-    waveform.setEditState(m5wf::M5Waveform::SELECT);
+    waveform.setEditState(M5Waveform::SELECT);
   }
   else
   {
-    waveform.setEditState(m5wf::M5Waveform::EDIT);
+    waveform.setEditState(M5Waveform::EDIT);
     // waveform.updateXAxisDiv(30);
     // waveform.updateXAxisPos(30);
     // waveform.updateYAxisDiv(30);
@@ -79,7 +79,7 @@ void loop()
   display.startWrite();
 
   // 波形描画更新処理
-  waveform.drawWaveform(points, 8, m5wf::M5Waveform::LINE);
+  waveform.drawWaveform(points, 8, M5Waveform::LINE);
   waveform.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
   display.endWrite();
