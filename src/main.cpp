@@ -2,13 +2,15 @@
 #include <M5Unified.h>
 #include "M5Plot.hpp"
 #include "TimeSeriesData.hpp"
+#include "M5Waveform.hpp"
 
 #define WIDTH 135
 #define HEIGHT 240
 #define DELAY 500
 
 M5GFX display;
-M5Plot waveform(&display);
+M5Plot m5plot(&display);
+M5Waveform wf(&m5plot);
 
 int count = 0;
 
@@ -17,7 +19,7 @@ int32_t chartHeight = 96;
 
 M5Plot::point_f points[8];
 
-TimeSeriesData tsData;
+// TimeSeriesData tsData;
 
 void setup()
 {
@@ -27,7 +29,9 @@ void setup()
   Serial.println("Device initialized.");
 
   // 全体領域のうち波形に割り当てる領域サイズを指定する
-  waveform.init(chartWidth, chartHeight, 4, 3);
+  m5plot.init(chartWidth, chartHeight, 4, 3);
+  wf.init(8);
+  wf.startDrawing();
 
   display.fillScreen(BLACK);
 
@@ -38,70 +42,19 @@ void setup()
     points[i].x = (float)i * 20.0;
     points[i].y = (float)rand;
   }
-
-  tsData.init(8);
 }
 
 void loop()
 {
-  // // 軸設定対象切り替えの模擬
-  // if ((count / 4) % 4 == 0)
-  // {
-  //   waveform.setEditTarget(M5Plot::Y_DIV);
-  // }
-  // else if ((count / 4) % 4 == 1)
-  // {
-  //   waveform.setEditTarget(M5Plot::Y_POS);
-  // }
-  // else if ((count / 4) % 4 == 2)
-  // {
-  //   waveform.setEditTarget(M5Plot::X_POS);
-  // }
-  // else if ((count / 4) % 4 == 3)
-  // {
-  //   waveform.setEditTarget(M5Plot::X_DIV);
-  // }
+  auto ret = wf.enqueue(points[count%8].y);
 
-  // // 軸設定状態切り替えの模擬
-  // if (count % 3 == 0)
-  // {
-  //   waveform.setEditState(M5Plot::NOT_EDIT);
-  //   // waveform.updateXAxisDiv(20);
-  //   // waveform.updateXAxisPos(20);
-  //   // waveform.updateYAxisDiv(20);
-  //   // waveform.updateYAxisPos(20);
-  // }
-  // else if (count % 3 == 1)
-  // {
-  //   waveform.setEditState(M5Plot::SELECT);
-  // }
-  // else
-  // {
-  //   waveform.setEditState(M5Plot::EDIT);
-  //   // waveform.updateXAxisDiv(30);
-  //   // waveform.updateXAxisPos(30);
-  //   // waveform.updateYAxisDiv(30);
-  //   // waveform.updateYAxisPos(30);
-  // }
-
-  // display.startWrite();
+  display.startWrite();
 
   // // 波形描画更新処理
-  // waveform.drawWaveform(points, 8, M5Plot::LINE);
-  // waveform.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
+  // m5plot.drawWaveform(points, 8, M5Plot::LINE);
+  m5plot.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
-  // display.endWrite();
-
-  tsData.write(points[count % 8].y);
-  TimeSeriesData::point_ts pt;
-  if (tsData.read(&pt) == 0)
-  {
-    display.printf("%.1f, %.1f\r\n", pt.timeDeltaSecond, pt.value);
-  }
-  else
-  {
-    display.printf("cannot read\r\n");
-  }
+  display.endWrite();
 
   count++;
   delay(DELAY);
