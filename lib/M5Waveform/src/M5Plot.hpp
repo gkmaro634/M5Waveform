@@ -35,7 +35,7 @@ namespace m5wf
     void setEditState(EditState state);
     void setEditTarget(EditTarget target);
 
-  private:
+  protected:
     M5GFX *_display;
     M5Canvas _canvas;
     M5Canvas _plotSprite;
