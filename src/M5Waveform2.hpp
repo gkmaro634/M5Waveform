@@ -15,7 +15,7 @@ namespace m5wf
   public:
     M5Waveform2() : M5Plot() {}
     M5Waveform2(M5GFX *display) : M5Plot(display), _tsData() {}
-    ~M5Waveform2()
+    virtual ~M5Waveform2()
     {
     }
 

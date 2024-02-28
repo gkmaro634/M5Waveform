@@ -13,7 +13,7 @@ namespace m5wf
   public:
     M5Plot() {}
     M5Plot(M5GFX *display) : _display(display), _canvas(display), _plotSprite(display), _figureSprite(display) { figureCanvas = &_canvas; }
-    ~M5Plot()
+    virtual ~M5Plot()
     {
       _plotSprite.deleteSprite();
       _figureSprite.deleteSprite();
