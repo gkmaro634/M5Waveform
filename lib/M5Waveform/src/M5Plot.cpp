@@ -17,15 +17,15 @@ namespace m5wf
     _figureWidth = width;
     _figureHeight = height;
 
-    _waveRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
-    _waveRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
+    _plotRegionWidth = _figureWidth - MARGIN - MARGIN - YAXIS_DIV_LABLE_WIDTH;
+    _plotRegionHeight = _figureHeight - MARGIN - MARGIN - XAXIS_DIV_LABLE_HEIGHT;
 
     _canvas.createSprite(_figureWidth, _figureHeight);
     _canvas.setColorDepth(8);
     _canvas.setPivot(_figureWidth / 2, _figureHeight / 2);
 
-    _waveSprite.createSprite(_waveRegionWidth, _waveRegionHeight);
-    _waveSprite.setColorDepth(8);
+    _plotSprite.createSprite(_plotRegionWidth, _plotRegionHeight);
+    _plotSprite.setColorDepth(8);
 
     _figureSprite.createSprite(_figureWidth, _figureHeight);
     _figureSprite.setColorDepth(8);
@@ -35,7 +35,7 @@ namespace m5wf
     _drawYAxisRulerLine();
 
     // 枠
-    _drawWaveformBorder();
+    _drawPlotBorder();
 
     // 選択枠
     _drawParamEditBorder();
@@ -49,10 +49,10 @@ namespace m5wf
     _renderFigure();
   }
 
-  void M5Plot::drawWaveform(point_f *points, uint16_t length, PlotType plotType)
+  void M5Plot::plot(point_f *points, uint16_t length, PlotType plotType)
   {
     _clearCanvas();
-    _clearWaveform();
+    _clearPlot();
 
     // point
     if (plotType == LINE_MARKER || plotType == MARKER)
@@ -63,7 +63,7 @@ namespace m5wf
         auto p = points[i];
         if (_point2px(p, &x_pt, &y_pt) == 0)
         {
-          _waveSprite.fillCircle(x_pt, y_pt, 2, GREEN);
+          _plotSprite.fillCircle(x_pt, y_pt, 2, GREEN);
         }
       }
     }
@@ -87,17 +87,17 @@ namespace m5wf
           continue;
         }
 
-        _waveSprite.drawLine(x1_pt, y1_pt, x2_pt, y2_pt, GREEN);
+        _plotSprite.drawLine(x1_pt, y1_pt, x2_pt, y2_pt, GREEN);
       }
     }
 
     _renderFigure();
-    _renderWaveform();
+    _renderPlot();
   }
 
-  void M5Plot::drawWaveform(point_f *points, uint16_t length)
+  void M5Plot::plot(point_f *points, uint16_t length)
   {
-    drawWaveform(points, length, LINE_MARKER);
+    plot(points, length, LINE_MARKER);
   }
 
   void M5Plot::updateXAxisDiv(uint16_t value)
@@ -136,7 +136,7 @@ namespace m5wf
     _drawParamEditBorder();
 
     _renderFigure();
-    _renderWaveform();
+    _renderPlot();
   }
 
   void M5Plot::setEditTarget(EditTarget target)
@@ -147,7 +147,7 @@ namespace m5wf
     _drawParamEditBorder();
 
     _renderFigure();
-    _renderWaveform();
+    _renderPlot();
   }
 
   void M5Plot::_renderFigure(void)
@@ -155,9 +155,9 @@ namespace m5wf
     _figureSprite.pushSprite(&_canvas, 0, 0, BLACK);
   }
 
-  void M5Plot::_renderWaveform(void)
+  void M5Plot::_renderPlot(void)
   {
-    _waveSprite.pushSprite(&_canvas, (int32_t)_waveRegionX, (int32_t)_waveRegionY, BLACK);
+    _plotSprite.pushSprite(&_canvas, (int32_t)_plotRegionX, (int32_t)_plotRegionY, BLACK);
   }
 
   void M5Plot::_clearCanvas(void)
@@ -165,9 +165,9 @@ namespace m5wf
     _canvas.fillScreen(BLACK);
   }
 
-  void M5Plot::_clearWaveform(void)
+  void M5Plot::_clearPlot(void)
   {
-    _waveSprite.fillScreen(BLACK);
+    _plotSprite.fillScreen(BLACK);
   }
 
   void M5Plot::_clearFigure(void)
@@ -188,50 +188,50 @@ namespace m5wf
       ret = 1;
     }
 
-    float dx = (float)_waveRegionWidth / (xEnd - xStart);
-    float dy = (float)_waveRegionHeight / (yEnd - yStart);
+    float dx = (float)_plotRegionWidth / (xEnd - xStart);
+    float dy = (float)_plotRegionHeight / (yEnd - yStart);
     *x_px = (int)((point.x - xStart) * dx);
-    *y_px = (int)(_waveRegionHeight - (point.y - yStart) * dy);
+    *y_px = (int)(_plotRegionHeight - (point.y - yStart) * dy);
 
     return ret;
   }
 
   void M5Plot::_drawXAxisRulerLine(void)
   {
-    float step = (float)_waveRegionWidth / (float)(_xAxisDivCount + 1);
+    float step = (float)_plotRegionWidth / (float)(_xAxisDivCount + 1);
     for (int i = 0; i < _xAxisDivCount; i++)
     {
-      float xPos = step * (i + 1) + _waveRegionX;
-      _drawDashedLine((int)xPos, _waveRegionY, (int)xPos, _waveRegionY + _waveRegionHeight, 6, 2, DARKGREEN);
+      float xPos = step * (i + 1) + _plotRegionX;
+      _drawDashedLine((int)xPos, _plotRegionY, (int)xPos, _plotRegionY + _plotRegionHeight, 6, 2, DARKGREEN);
     }
   }
 
   void M5Plot::_drawYAxisRulerLine(void)
   {
-    float step = (float)_waveRegionHeight / (float)(_yAxisDivCount + 1);
+    float step = (float)_plotRegionHeight / (float)(_yAxisDivCount + 1);
     for (int i = 0; i < _yAxisDivCount; i++)
     {
-      float yPos = step * (i + 1) + _waveRegionY;
-      _drawDashedLine(_waveRegionX, (int)yPos, _waveRegionX + _waveRegionWidth, (int)yPos, 6, 2, DARKGREEN);
+      float yPos = step * (i + 1) + _plotRegionY;
+      _drawDashedLine(_plotRegionX, (int)yPos, _plotRegionX + _plotRegionWidth, (int)yPos, 6, 2, DARKGREEN);
     }
   }
 
-  void M5Plot::_drawWaveformBorder(void)
+  void M5Plot::_drawPlotBorder(void)
   {
     _figureSprite.drawRect(
-        _waveRegionX,
-        _waveRegionY,
-        _waveRegionWidth,
-        _waveRegionHeight,
+        _plotRegionX,
+        _plotRegionY,
+        _plotRegionWidth,
+        _plotRegionHeight,
         DARKGREEN);
   }
 
   void M5Plot::_drawParamEditBorder(void)
   {
-    _figureSprite.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLACK);
-    _figureSprite.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLACK);
-    _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLACK);
-    _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(MARGIN, _plotRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(MARGIN, _plotRegionY + _plotRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(_plotRegionX + _plotRegionWidth - XAXIS_DIV_LABLE_WIDTH, _plotRegionY + _plotRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, BLACK);
+    _figureSprite.drawRect(_plotRegionX, _plotRegionY + _plotRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, BLACK);
 
     if (_editState == NOT_EDIT)
     {
@@ -255,16 +255,16 @@ namespace m5wf
     switch (_editTarget)
     {
     case Y_DIV:
-      _figureSprite.drawRect(MARGIN, _waveRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, borderColor);
+      _figureSprite.drawRect(MARGIN, _plotRegionY, YAXIS_DIV_LABLE_WIDTH, YAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     case Y_POS:
-      _figureSprite.drawRect(MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, borderColor);
+      _figureSprite.drawRect(MARGIN, _plotRegionY + _plotRegionHeight - YAXIS_POS_LABLE_HEIGHT, YAXIS_POS_LABLE_WIDTH, YAXIS_POS_LABLE_HEIGHT, borderColor);
       break;
     case X_DIV:
-      _figureSprite.drawRect(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH, _waveRegionY + _waveRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
+      _figureSprite.drawRect(_plotRegionX + _plotRegionWidth - XAXIS_DIV_LABLE_WIDTH, _plotRegionY + _plotRegionHeight, XAXIS_DIV_LABLE_WIDTH, XAXIS_DIV_LABLE_HEIGHT, borderColor);
       break;
     case X_POS:
-      _figureSprite.drawRect(_waveRegionX, _waveRegionY + _waveRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, borderColor);
+      _figureSprite.drawRect(_plotRegionX, _plotRegionY + _plotRegionHeight, XAXIS_POS_LABLE_WIDTH, XAXIS_POS_LABLE_HEIGHT, borderColor);
       break;
     default:
       break;
@@ -273,27 +273,27 @@ namespace m5wf
 
   void M5Plot::_drawYAxisDivLabel(void)
   {
-    _figureSprite.setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN);
+    _figureSprite.setCursor(MARGIN + MARGIN, _plotRegionY + MARGIN);
     _figureSprite.printf("%d", _yAxisDiv);
-    _figureSprite.setCursor(MARGIN + MARGIN, _waveRegionY + MARGIN + LABEL_HEIGHT);
+    _figureSprite.setCursor(MARGIN + MARGIN, _plotRegionY + MARGIN + LABEL_HEIGHT);
     _figureSprite.printf("/div");
   }
 
   void M5Plot::_drawYAxisPosLabel(void)
   {
-    _figureSprite.setCursor(MARGIN + MARGIN, _waveRegionY + _waveRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
+    _figureSprite.setCursor(MARGIN + MARGIN, _plotRegionY + _plotRegionHeight - YAXIS_POS_LABLE_HEIGHT + MARGIN);
     _figureSprite.printf("%5d", _yAxisPos);
   }
 
   void M5Plot::_drawXAxisDivLabel(void)
   {
-    _figureSprite.setCursor(_waveRegionX + _waveRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, _waveRegionY + _waveRegionHeight + MARGIN);
+    _figureSprite.setCursor(_plotRegionX + _plotRegionWidth - XAXIS_DIV_LABLE_WIDTH + MARGIN, _plotRegionY + _plotRegionHeight + MARGIN);
     _figureSprite.printf("%5d /div", _xAxisDiv);
   }
 
   void M5Plot::_drawXAxisPosLabel(void)
   {
-    _figureSprite.setCursor(_waveRegionX + MARGIN, _waveRegionY + _waveRegionHeight + MARGIN);
+    _figureSprite.setCursor(_plotRegionX + MARGIN, _plotRegionY + _plotRegionHeight + MARGIN);
     _figureSprite.printf("%d", _xAxisPos);
   }
 

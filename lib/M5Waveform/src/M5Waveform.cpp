@@ -103,7 +103,7 @@ namespace m5wf
     }
 
     // Plotにわたす
-    _plot->drawWaveform(_points, _pointsLength);
+    _plot->plot(_points, _pointsLength);
   }
 }
 
