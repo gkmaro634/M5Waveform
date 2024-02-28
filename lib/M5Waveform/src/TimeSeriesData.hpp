@@ -4,6 +4,7 @@
 #include <mutex>
 #include <time.h>
 #include <M5Unified.h>
+#include "utils/m5wf_common.hpp"
 
 namespace m5wf
 {
@@ -11,12 +12,6 @@ namespace m5wf
   {
 
   public:
-    typedef struct
-    {
-      float timeDeltaSecond;
-      float value;
-    } point_ts;
-
     TimeSeriesData() {}
     ~TimeSeriesData()
     {

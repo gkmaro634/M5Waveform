@@ -17,7 +17,7 @@ int count = 0;
 int32_t chartWidth = 200;
 int32_t chartHeight = 96;
 
-M5Plot::point_f points[8];
+m5wf::point_f points[8];
 
 // TimeSeriesData tsData;
 

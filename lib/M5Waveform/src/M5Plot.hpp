@@ -3,55 +3,14 @@
 
 #include <M5Unified.h>
 #include <M5GFX.h>
+#include "utils/m5wf_common.hpp"
 
 namespace m5wf
 {
-  namespace figure_constants
-  {
-    static constexpr int MARGIN = 4;
-    static constexpr int LABEL_HEIGHT = 16;
-    static constexpr int YAXIS_DIV_LABLE_WIDTH = 40;
-    static constexpr int YAXIS_DIV_LABLE_HEIGHT = LABEL_HEIGHT * 2;
-    static constexpr int YAXIS_POS_LABLE_WIDTH = 40;
-    static constexpr int YAXIS_POS_LABLE_HEIGHT = LABEL_HEIGHT;
-    static constexpr int XAXIS_DIV_LABLE_WIDTH = 80;
-    static constexpr int XAXIS_DIV_LABLE_HEIGHT = LABEL_HEIGHT;
-    static constexpr int XAXIS_POS_LABLE_WIDTH = 40;
-    static constexpr int XAXIS_POS_LABLE_HEIGHT = LABEL_HEIGHT;
-  }
-
   class M5Plot
   {
 
   public:
-    typedef enum
-    {
-      X_DIV = 1,
-      X_POS,
-      Y_DIV,
-      Y_POS,
-    } EditTarget;
-
-    typedef enum
-    {
-      NOT_EDIT = 1,
-      SELECT,
-      EDIT,
-    } EditState;
-
-    typedef enum
-    {
-      LINE = 1,
-      MARKER,
-      LINE_MARKER
-    } PlotType;
-
-    typedef struct 
-    {
-      float x;
-      float y;
-    } point_f;
-
     M5Plot() {}
     M5Plot(M5GFX *display) : _display(display), _canvas(display), _plotSprite(display), _figureSprite(display) { figureCanvas = &_canvas; }
     ~M5Plot()
@@ -73,8 +32,8 @@ namespace m5wf
     void updateYAxisDiv(uint16_t value);
     void updateYAxisPos(uint16_t value);
 
-    void setEditState(M5Plot::EditState state);
-    void setEditTarget(M5Plot::EditTarget target);
+    void setEditState(EditState state);
+    void setEditTarget(EditTarget target);
 
   private:
     M5GFX *_display;
@@ -82,16 +41,16 @@ namespace m5wf
     M5Canvas _plotSprite;
     M5Canvas _figureSprite;
 
-    M5Plot::EditTarget _editTarget = Y_DIV;
-    M5Plot::EditState _editState = NOT_EDIT;
+    EditTarget _editTarget = Y_DIV;
+    EditState _editState = NOT_EDIT;
 
     /// @brief 波形領域全体の幅
     int32_t _figureWidth;
     /// @brief 波形領域全体の高さ
     int32_t _figureHeight;
 
-    uint16_t _plotRegionX = m5wf::figure_constants::MARGIN + m5wf::figure_constants::YAXIS_DIV_LABLE_WIDTH;
-    uint16_t _plotRegionY = m5wf::figure_constants::MARGIN;
+    uint16_t _plotRegionX = figure_constants::MARGIN + figure_constants::YAXIS_DIV_LABLE_WIDTH;
+    uint16_t _plotRegionY = figure_constants::MARGIN;
 
     uint16_t _plotRegionWidth;
     uint16_t _plotRegionHeight;

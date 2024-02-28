@@ -16,7 +16,7 @@ namespace m5wf
       _points = nullptr;
     }
 
-    _points = new M5Plot::point_f[bufferSize];
+    _points = new point_f[bufferSize];
     if (_points == nullptr)
     {
       return 1;
@@ -29,7 +29,7 @@ namespace m5wf
     }
 
     // task create
-    uint32_t toAllocSize = sizeof(M5Plot::point_f) * bufferSize + 1024;
+    uint32_t toAllocSize = sizeof(point_f) * bufferSize + 1024;
     BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
     configASSERT(status == pdPASS);
     if (status != pdPASS)
@@ -77,13 +77,13 @@ namespace m5wf
     return _tsData.write(value);
   }
 
-  uint8_t M5Waveform::enqueue(TimeSeriesData::point_ts aPoint)
+  uint8_t M5Waveform::enqueue(point_ts aPoint)
   {
     return _tsData.write(aPoint);
   }
   void M5Waveform::job()
   {
-    m5wf::TimeSeriesData::point_ts aPoint;
+    m5wf::point_ts aPoint;
     if (_tsData.read(&aPoint) != 0)
     {
       delay(100); // TODO: 適切な遅延
@@ -112,7 +112,7 @@ static void _drawingTask(void *arg)
   // M5Waveformオブジェクトへのポインタにキャスト
   auto *waveform = static_cast<m5wf::M5Waveform *>(arg);
 
-  m5wf::TimeSeriesData::point_ts aPoint;
+  m5wf::point_ts aPoint;
 
   while (true)
   {

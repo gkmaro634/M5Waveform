@@ -36,7 +36,7 @@ namespace m5wf
     uint8_t stopDrawing();
 
     uint8_t enqueue(float value);
-    uint8_t enqueue(TimeSeriesData::point_ts aPoint);
+    uint8_t enqueue(point_ts aPoint);
 
     void job();
 
@@ -47,7 +47,7 @@ namespace m5wf
 
     TaskHandle_t _handleDrawingTask = nullptr;
     // void _drawingTask(void *arg);
-    M5Plot::point_f *_points;
+    point_f *_points;
     uint32_t _bufferSize = 0;
     uint16_t _pointsLength = 0;
   };
