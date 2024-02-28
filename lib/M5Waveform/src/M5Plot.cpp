@@ -104,7 +104,10 @@ namespace m5wf
   {
     _xAxisDiv = value;
     _drawXAxisDivLabel();
+
+    _clearCanvas();
     _renderFigure();
+    _renderPlot();
   }
 
   void M5Plot::updateXAxisPos(uint16_t value)
@@ -297,6 +300,26 @@ namespace m5wf
     _figureSprite.printf("%d", _xAxisPos);
   }
 
+  float M5Plot::_getXAxisStart()
+  {
+    return (float)_xAxisPos;
+  }
+
+  float M5Plot::_getYAxisStart()
+  {
+    return (float)_yAxisPos;
+  }
+
+  float M5Plot::_getXAxisEnd()
+  {
+    return (float)_xAxisPos + (float)_xAxisDiv * ((float)_xAxisDivCount + (float)1);
+  }
+
+  float M5Plot::_getYAxisEnd()
+  {
+    return (float)_yAxisPos + (float)_yAxisDiv * ((float)_yAxisDivCount + (float)1);
+  }
+  
   void M5Plot::_drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color)
   {
     float distance = sqrt(sq(x1 - x0) + sq(y1 - y0));
@@ -316,4 +339,5 @@ namespace m5wf
       y += dy;
     }
   }
+
 }

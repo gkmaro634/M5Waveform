@@ -62,25 +62,10 @@ namespace m5wf
     uint16_t _yAxisDiv = 20;
     uint16_t _yAxisPos = 0;
 
-    inline float _getXAxisStart()
-    {
-      return (float)_xAxisPos;
-    }
-
-    inline float _getYAxisStart()
-    {
-      return (float)_yAxisPos;
-    }
-
-    inline float _getXAxisEnd()
-    {
-      return (float)_xAxisPos + (float)_xAxisDiv * ((float)_xAxisDivCount + (float)1);
-    }
-
-    inline float _getYAxisEnd()
-    {
-      return (float)_yAxisPos + (float)_yAxisDiv * ((float)_yAxisDivCount + (float)1);
-    }
+    float _getXAxisStart();
+    float _getYAxisStart();
+    float _getXAxisEnd();
+    float _getYAxisEnd();
 
     void _renderFigure(void);
     void _renderPlot(void);

@@ -25,6 +25,8 @@ void setup()
 
   // 全体領域のうち波形に割り当てる領域サイズを指定する
   wf.init(chartWidth, chartHeight, 4, 3);
+  wf.updateXAxisDiv(2);
+  wf.updateYAxisDiv(10);
   wf.startDrawing(8);
 
   display.fillScreen(BLACK);
@@ -36,6 +38,7 @@ void setup()
     points[i].x = (float)i * 20.0;
     points[i].y = (float)rand;
   }
+
 }
 
 void loop()

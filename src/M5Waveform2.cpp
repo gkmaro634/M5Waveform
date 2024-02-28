@@ -84,26 +84,39 @@ namespace m5wf
 
   void M5Waveform2::job()
   {
+    // _clearCanvas();
+    // _clearPlot();
+
     m5wf::point_ts aPoint;
     if (_tsData.read(&aPoint) != 0)
     {
       delay(100); // TODO: 適切な遅延
+      return;
     }
 
     // 描画更新処理
     _prev = _curr;
     _curr = { _prev.x + aPoint.timeDeltaSecond, aPoint.value };
     int px, py;
+    _point2px(_curr, &px, &py);
+    float xEnd = _getXAxisEnd();
+    _display->printf("px:%d, end:%.1f\r\n", px, xEnd);
+    _hasReachedRightEdge |= (xEnd < _curr.x);
+
     if (_hasReachedRightEdge == false)
     {
       // 右端に到達していない場合、左から順番に点を打つ
-      // _point2px(_curr, &px, &py);
-      // _plotSprite.drawCircle(px, py, 4);
+      _plotSprite.drawCircle(px, py, 2, GREEN);
     }
     else
     {
       // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
+      _plotSprite.scroll(aPoint.timeDeltaSecond, 0);
+      _plotSprite.drawCircle(xEnd, py, 2, RED);
     }
+
+    // _renderFigure();
+    _renderPlot();
 
     // TODO: 描画更新完了コールバック関数を呼ぶ
     // if (_callback != nullptr)
