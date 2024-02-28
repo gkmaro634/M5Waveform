@@ -32,6 +32,8 @@ namespace m5wf
     bool _isDrawing = false;
 
     TaskHandle_t _handleDrawingTask = nullptr;
+    point_f _prev;
+    point_f _curr;
     bool _hasReachedRightEdge = false;
   };
 }

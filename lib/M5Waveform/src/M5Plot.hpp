@@ -62,6 +62,26 @@ namespace m5wf
     uint16_t _yAxisDiv = 20;
     uint16_t _yAxisPos = 0;
 
+    inline float _getXAxisStart()
+    {
+      return (float)_xAxisPos;
+    }
+
+    inline float _getYAxisStart()
+    {
+      return (float)_yAxisPos;
+    }
+
+    inline float _getXAxisEnd()
+    {
+      return (float)_xAxisPos + (float)_xAxisDiv * ((float)_xAxisDivCount + (float)1);
+    }
+
+    inline float _getYAxisEnd()
+    {
+      return (float)_yAxisPos + (float)_yAxisDiv * ((float)_yAxisDivCount + (float)1);
+    }
+
     void _renderFigure(void);
     void _renderPlot(void);
 
@@ -77,7 +97,7 @@ namespace m5wf
     void _drawXAxisPosLabel(void);
     void _drawYAxisDivLabel(void);
     void _drawYAxisPosLabel(void);
-    uint8_t _point2px(point_f point, int* x_px, int* y_px);
+    uint8_t _point2px(point_f point, int *x_px, int *y_px);
     void _drawDashedLine(int x0, int y0, int x1, int y1, int segmentLength, int spaceLength, uint16_t color);
   };
 }

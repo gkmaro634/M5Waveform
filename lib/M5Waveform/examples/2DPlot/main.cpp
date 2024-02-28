@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <M5Unified.h>
 #include "M5Plot.hpp"
@@ -14,7 +15,7 @@ int count = 0;
 int32_t chartWidth = 200;
 int32_t chartHeight = 96;
 
-M5Plot::point_f points[8];
+m5wf::point_f points[8];
 
 void setup()
 {
@@ -42,22 +43,22 @@ void loop()
   // 軸設定対象切り替えの模擬
   if ((count / 4) % 4 == 0)
   {
-    m5plot.setEditTarget(M5Plot::Y_DIV);
+    m5plot.setEditTarget(m5wf::Y_DIV);
   }
   else if ((count / 4) % 4 == 1){
-    m5plot.setEditTarget(M5Plot::Y_POS);
+    m5plot.setEditTarget(m5wf::Y_POS);
   }
   else if ((count / 4) % 4 == 2){
-    m5plot.setEditTarget(M5Plot::X_POS);
+    m5plot.setEditTarget(m5wf::X_POS);
   }
   else if ((count / 4) % 4 == 3){
-    m5plot.setEditTarget(M5Plot::X_DIV);
+    m5plot.setEditTarget(m5wf::X_DIV);
   }
 
   // 軸設定状態切り替えの模擬
   if (count % 3 == 0)
   {
-    m5plot.setEditState(M5Plot::NOT_EDIT);
+    m5plot.setEditState(m5wf::NOT_EDIT);
     // m5plot.updateXAxisDiv(20);
     // m5plot.updateXAxisPos(20);
     // m5plot.updateYAxisDiv(20);
@@ -65,11 +66,11 @@ void loop()
   }
   else if(count % 3 == 1)
   {
-    m5plot.setEditState(M5Plot::SELECT);
+    m5plot.setEditState(m5wf::SELECT);
   }
   else
   {
-    m5plot.setEditState(M5Plot::EDIT);
+    m5plot.setEditState(m5wf::EDIT);
     // m5plot.updateXAxisDiv(30);
     // m5plot.updateXAxisPos(30);
     // m5plot.updateYAxisDiv(30);
@@ -79,7 +80,7 @@ void loop()
   display.startWrite();
 
   // 波形描画更新処理
-  m5plot.plot(points, 8, M5Plot::LINE);
+  m5plot.plot(points, 8, m5wf::LINE);
   m5plot.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
   display.endWrite();

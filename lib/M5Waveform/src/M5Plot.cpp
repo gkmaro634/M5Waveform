@@ -177,10 +177,10 @@ namespace m5wf
 
   uint8_t M5Plot::_point2px(point_f point, int *x_px, int *y_px)
   {
-    float xStart = (float)_xAxisPos;
-    float xEnd = (float)_xAxisPos + (float)_xAxisDiv * ((float)_xAxisDivCount + (float)1);
-    float yStart = (float)_yAxisPos;
-    float yEnd = (float)_yAxisPos + (float)_yAxisDiv * ((float)_yAxisDivCount + (float)1);
+    float xStart = _getXAxisStart();
+    float xEnd = _getXAxisEnd();
+    float yStart = _getYAxisStart();
+    float yEnd = _getYAxisEnd();
     uint8_t ret = 0;
 
     if (point.x < xStart || xEnd < point.x || point.y < yStart || yEnd < point.y)

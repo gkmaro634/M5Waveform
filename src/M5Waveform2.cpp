@@ -34,7 +34,7 @@ namespace m5wf
     }
 
     // task create
-    uint32_t toAllocSize = sizeof(point_f) * bufferSize + 1024;
+    uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
     BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
     configASSERT(status == pdPASS);
     if (status != pdPASS)
@@ -91,9 +91,28 @@ namespace m5wf
     }
 
     // 描画更新処理
-    // 右端に到達していない場合、左から順番に点を打つ
-    // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
-    // Y軸レンジ変更での再描画に備えて描画済み点群をキャッシュするべきか <= 点が膨大になりうる。しかしながらキャッシュしないと突発的な大きな信号の表示に耐えられない。
+    _prev = _curr;
+    _curr = { _prev.x + aPoint.timeDeltaSecond, aPoint.value };
+    int px, py;
+    if (_hasReachedRightEdge == false)
+    {
+      // 右端に到達していない場合、左から順番に点を打つ
+      // _point2px(_curr, &px, &py);
+      // _plotSprite.drawCircle(px, py, 4);
+    }
+    else
+    {
+      // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
+    }
+
+    // TODO: 描画更新完了コールバック関数を呼ぶ
+    // if (_callback != nullptr)
+    // {
+    //   _callback();
+    // }
+
+    // TODO: Y軸レンジ変更での再描画に備えて描画済み点群をキャッシュするべきか <= 点が膨大になりうる。しかしながらキャッシュしないと突発的な大きな信号の表示に耐えられない。
+    // Task生成時に確保したメモリ以下に収まる保証が必要である。最大点数は描画幅までで済むはずなので、その方向で検討する。
 
     // 自身で保持する配列に割り当てる
     // 後ろに詰める
@@ -122,5 +141,5 @@ static void _drawingTask(void *arg)
   {
     // FreeRTOSのTask内ではインスタンスのメンバにアクセスできないので、仕方なく専用のpublicメソッドを設けて呼び出すこととする。
     waveform->job();
- }
+  }
 }

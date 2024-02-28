@@ -45,7 +45,7 @@ void loop()
   display.startWrite();
 
   // // 波形描画更新処理
-  // m5plot.drawWaveform(points, 8, M5Plot::LINE);
+  // m5plot.drawWaveform(points, 8, m5wf::LINE);
   wf.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
   display.endWrite();
