@@ -10,16 +10,24 @@ static void _drawingTask(void *arg);
 
 namespace m5wf
 {
-  class M5Waveform2 : public M5Plot
+  class M5Waveform : public M5Plot
   {
   public:
-    M5Waveform2() : M5Plot() {}
-    M5Waveform2(M5GFX *display) : M5Plot(display), _tsData() {}
-    virtual ~M5Waveform2()
+    typedef std::function<void()> Callback;
+
+    M5Waveform() : M5Plot() {}
+    M5Waveform(M5GFX *display) : M5Plot(display), _tsData() {}
+    virtual ~M5Waveform()
     {
+      if (_handleDrawingTask != nullptr)
+      {
+        vTaskDelete(_handleDrawingTask);
+      }
+      _callback = nullptr;
     }
 
     uint8_t startDrawing(uint32_t bufferSize);
+    uint8_t startDrawing(uint32_t bufferSize, Callback onDrawing);
     uint8_t stopDrawing();
 
     uint8_t enqueue(float value);
@@ -30,6 +38,7 @@ namespace m5wf
   private:
     TimeSeriesData _tsData;
     bool _isDrawing = false;
+    Callback _callback = nullptr;
 
     TaskHandle_t _handleDrawingTask = nullptr;
     point_f _prev;
@@ -38,6 +47,6 @@ namespace m5wf
   };
 }
 
-using M5Waveform2 = m5wf::M5Waveform2;
+using M5Waveform = m5wf::M5Waveform;
 
 #endif
