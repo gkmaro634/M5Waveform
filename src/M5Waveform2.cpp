@@ -1,5 +1,7 @@
 #include "M5Waveform2.hpp"
 
+using namespace m5wf::figure_constants;
+
 namespace m5wf
 {
   uint8_t M5Waveform2::startDrawing(uint32_t bufferSize)
@@ -41,15 +43,7 @@ namespace m5wf
     {
       return 1;
     }
-    // else
-    // {
-    //   vTaskSuspend(_handleDrawingTask);
-    // }
-
     _isDrawing = true;
-
-    // // launch drawingTask
-    // vTaskResume(_handleDrawingTask);
 
     return 0;
   }
@@ -63,7 +57,6 @@ namespace m5wf
     _isDrawing = false;
 
     // stop drawingTask
-    // vTaskSuspend(_handleDrawingTask);
     if (_handleDrawingTask != nullptr)
     {
       vTaskDelete(_handleDrawingTask);
@@ -84,9 +77,6 @@ namespace m5wf
 
   void M5Waveform2::job()
   {
-    // _clearCanvas();
-    // _clearPlot();
-
     m5wf::point_ts aPoint;
     if (_tsData.read(&aPoint) != 0)
     {
@@ -94,28 +84,33 @@ namespace m5wf
       return;
     }
 
+    _clearCanvas();
+
     // 描画更新処理
     _prev = _curr;
     _curr = { _prev.x + aPoint.timeDeltaSecond, aPoint.value };
     int px, py;
     _point2px(_curr, &px, &py);
     float xEnd = _getXAxisEnd();
-    _display->printf("px:%d, end:%.1f\r\n", px, xEnd);
     _hasReachedRightEdge |= (xEnd < _curr.x);
 
     if (_hasReachedRightEdge == false)
     {
       // 右端に到達していない場合、左から順番に点を打つ
-      _plotSprite.drawCircle(px, py, 2, GREEN);
+      _plotSprite.drawCircle(px, py, MARKER_RADIUS, GREEN);
     }
     else
     {
       // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
-      _plotSprite.scroll(aPoint.timeDeltaSecond, 0);
-      _plotSprite.drawCircle(xEnd, py, 2, RED);
+      float xStart = _getXAxisStart();
+      float dx = _plotRegionWidth / (xEnd - xStart);
+      int_fast16_t xScroll = -dx * aPoint.timeDeltaSecond;
+      _plotSprite.scroll(xScroll, 0);
+
+      _plotSprite.drawCircle((int)_plotRegionWidth-MARKER_RADIUS, py, MARKER_RADIUS, GREEN);
     }
 
-    // _renderFigure();
+    _renderFigure();
     _renderPlot();
 
     // TODO: 描画更新完了コールバック関数を呼ぶ
@@ -126,22 +121,7 @@ namespace m5wf
 
     // TODO: Y軸レンジ変更での再描画に備えて描画済み点群をキャッシュするべきか <= 点が膨大になりうる。しかしながらキャッシュしないと突発的な大きな信号の表示に耐えられない。
     // Task生成時に確保したメモリ以下に収まる保証が必要である。最大点数は描画幅までで済むはずなので、その方向で検討する。
-
-    // 自身で保持する配列に割り当てる
-    // 後ろに詰める
-    // for (int i = _bufferSize - 1; i >= 1; i--)
-    // {
-    //   _points[i] = _points[i - 1];
-    // }
-    // _points[0] = {aPoint.timeDeltaSecond, aPoint.value};
-
-    // if (_pointsLength < _bufferSize)
-    // {
-    //   _pointsLength++;
-    // }
-
-    // // Plotにわたす
-    // _plot->plot(_points, _pointsLength);
+    // 同一X画素位置に複数点が存在する場合のケアも必要。最大最小を保持するか逐次平均か。前者のほうがデータを誤解なく表現できる。
   }
 }
 

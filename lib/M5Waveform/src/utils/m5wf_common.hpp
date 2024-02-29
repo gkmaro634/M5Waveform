@@ -15,6 +15,7 @@ namespace m5wf
     static constexpr int XAXIS_DIV_LABLE_HEIGHT = LABEL_HEIGHT;
     static constexpr int XAXIS_POS_LABLE_WIDTH = 40;
     static constexpr int XAXIS_POS_LABLE_HEIGHT = LABEL_HEIGHT;
+    static constexpr int MARKER_RADIUS = 2;
   }
 
   typedef enum

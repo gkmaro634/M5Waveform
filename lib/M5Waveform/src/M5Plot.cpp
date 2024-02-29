@@ -24,7 +24,8 @@ namespace m5wf
     _canvas.setColorDepth(8);
     _canvas.setPivot(_figureWidth / 2, _figureHeight / 2);
 
-    _plotSprite.createSprite(_plotRegionWidth, _plotRegionHeight);
+    // 右端にマーカを打った場合に見きれないように余分に領域を確保する
+    _plotSprite.createSprite(_plotRegionWidth + MARKER_RADIUS, _plotRegionHeight);
     _plotSprite.setColorDepth(8);
 
     _figureSprite.createSprite(_figureWidth, _figureHeight);
@@ -63,7 +64,7 @@ namespace m5wf
         auto p = points[i];
         if (_point2px(p, &x_pt, &y_pt) == 0)
         {
-          _plotSprite.fillCircle(x_pt, y_pt, 2, GREEN);
+          _plotSprite.fillCircle(x_pt, y_pt, MARKER_RADIUS, GREEN);
         }
       }
     }
