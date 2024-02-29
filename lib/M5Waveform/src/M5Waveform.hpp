@@ -4,7 +4,7 @@
 #include <M5Unified.h>
 #include <M5GFX.h>
 #include "M5Plot.hpp"
-#include "TimeSeriesData.hpp"
+#include "utils/TimeSeriesData.hpp"
 
 static void _drawingTask(void *arg);
 
