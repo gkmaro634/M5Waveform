@@ -1,20 +1,21 @@
+
 #include <Arduino.h>
 #include <M5Unified.h>
-#include "M5Waveform.hpp"
+#include "M5Plot.hpp"
 
 #define WIDTH 135
 #define HEIGHT 240
 #define DELAY 3000
 
 M5GFX display;
-M5Waveform waveform(&display);
+M5Plot m5plot(&display);
 
 int count = 0;
 
 int32_t chartWidth = 200;
 int32_t chartHeight = 96;
 
-M5Waveform::point_f points[8];
+m5wf::point_f points[8];
 
 void setup()
 {
@@ -24,7 +25,7 @@ void setup()
   Serial.println("Device initialized.");
 
   // 全体領域のうち波形に割り当てる領域サイズを指定する
-  waveform.init(chartWidth, chartHeight, 4, 3);
+  m5plot.init(chartWidth, chartHeight, 4, 3);
 
   display.fillScreen(BLACK);
 
@@ -42,45 +43,45 @@ void loop()
   // 軸設定対象切り替えの模擬
   if ((count / 4) % 4 == 0)
   {
-    waveform.setEditTarget(M5Waveform::Y_DIV);
+    m5plot.setEditTarget(m5wf::Y_DIV);
   }
   else if ((count / 4) % 4 == 1){
-    waveform.setEditTarget(M5Waveform::Y_POS);
+    m5plot.setEditTarget(m5wf::Y_POS);
   }
   else if ((count / 4) % 4 == 2){
-    waveform.setEditTarget(M5Waveform::X_POS);
+    m5plot.setEditTarget(m5wf::X_POS);
   }
   else if ((count / 4) % 4 == 3){
-    waveform.setEditTarget(M5Waveform::X_DIV);
+    m5plot.setEditTarget(m5wf::X_DIV);
   }
 
   // 軸設定状態切り替えの模擬
   if (count % 3 == 0)
   {
-    waveform.setEditState(M5Waveform::NOT_EDIT);
-    // waveform.updateXAxisDiv(20);
-    // waveform.updateXAxisPos(20);
-    // waveform.updateYAxisDiv(20);
-    // waveform.updateYAxisPos(20);
+    m5plot.setEditState(m5wf::NOT_EDIT);
+    // m5plot.updateXAxisDiv(20);
+    // m5plot.updateXAxisPos(20);
+    // m5plot.updateYAxisDiv(20);
+    // m5plot.updateYAxisPos(20);
   }
   else if(count % 3 == 1)
   {
-    waveform.setEditState(M5Waveform::SELECT);
+    m5plot.setEditState(m5wf::SELECT);
   }
   else
   {
-    waveform.setEditState(M5Waveform::EDIT);
-    // waveform.updateXAxisDiv(30);
-    // waveform.updateXAxisPos(30);
-    // waveform.updateYAxisDiv(30);
-    // waveform.updateYAxisPos(30);
+    m5plot.setEditState(m5wf::EDIT);
+    // m5plot.updateXAxisDiv(30);
+    // m5plot.updateXAxisPos(30);
+    // m5plot.updateYAxisDiv(30);
+    // m5plot.updateYAxisPos(30);
   }
 
   display.startWrite();
 
   // 波形描画更新処理
-  waveform.drawWaveform(points, 8, M5Waveform::LINE);
-  waveform.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
+  m5plot.plot(points, 8, m5wf::LINE);
+  m5plot.figureCanvas->pushRotateZoom(67.5, 120, 90, 1, 1);
 
   display.endWrite();
 
