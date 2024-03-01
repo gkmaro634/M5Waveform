@@ -30,8 +30,8 @@ namespace m5wf
     uint8_t startDrawing(uint32_t bufferSize, Callback onDrawing);
     uint8_t stopDrawing();
 
-    uint8_t enqueue(float value);
-    uint8_t enqueue(point_ts aPoint);
+    uint8_t enqueue(float value, uint32_t timeoutMs = 100);
+    uint8_t enqueue(point_ts aPoint, uint32_t timeoutMs = 100);
 
     void job();
 

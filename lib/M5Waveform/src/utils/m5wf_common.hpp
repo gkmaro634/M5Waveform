@@ -18,6 +18,12 @@ namespace m5wf
     static constexpr int MARKER_RADIUS = 2;
   }
 
+  namespace return_codes
+  {
+    static constexpr uint8_t OK = 0;
+    static constexpr uint8_t NG = 1;
+  }
+
   typedef enum
   {
     X_DIV = 1,

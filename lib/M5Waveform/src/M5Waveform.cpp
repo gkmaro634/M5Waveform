@@ -13,56 +13,53 @@ namespace m5wf
   {
     if (_isDrawing == true)
     {
-      return 1;
+      return return_codes::NG;
     }
 
-    // _bufferSize = 0;
-    if (_tsData.init(bufferSize) != 0)
+    try
     {
-      return 1;
+      // delete unexpected handler
+      if (_handleDrawingTask != nullptr)
+      {
+        vTaskDelete(_handleDrawingTask);
+      }
+      _callback = nullptr;
+
+      // create queue
+      if(_tsData.init(bufferSize) != return_codes::OK)
+      {
+        throw "_tsData.init(bufferSize) != return_codes::OK";
+      }
+
+      // set callback
+      _callback = onDrawing;
+
+      // task create
+      uint32_t toAllocSize = 2048;// 暫定
+      // uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
+      BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
+      configASSERT(status == pdPASS);
+      if (status != pdPASS)
+      {
+        throw "status != pdPASS";
+      }
+
+      _isDrawing = true;
+
+      return return_codes::OK;
     }
-
-    // if (_points != nullptr)
-    // {
-    //   delete[] _points;
-    //   _points = nullptr;
-    // }
-
-    // _points = new point_f[bufferSize];
-    // if (_points == nullptr)
-    // {
-    //   return 1;
-    // }
-    // _bufferSize = bufferSize;
-
-    if (_handleDrawingTask != nullptr)
-    {
-      vTaskDelete(_handleDrawingTask);
-    }
-
-    // set callback
-    _callback = onDrawing;
-
-    // task create
-    uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
-    BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
-    configASSERT(status == pdPASS);
-    if (status != pdPASS)
+    catch (const std::exception &e)
     {
       _callback = nullptr;
-      return 1;
+      return return_codes::NG;
     }
-    
-    _isDrawing = true;
-
-    return 0;
   }
 
   uint8_t M5Waveform::stopDrawing()
   {
     if (_isDrawing == false)
     {
-      return 1;
+      return return_codes::NG;
     }
     _isDrawing = false;
 
@@ -72,25 +69,25 @@ namespace m5wf
       vTaskDelete(_handleDrawingTask);
     }
 
-    return 0;
+    return return_codes::OK;
   }
 
-  uint8_t M5Waveform::enqueue(float value)
+  uint8_t M5Waveform::enqueue(float value, uint32_t timeoutMs)
   {
-    return _tsData.write(value);
+    return _tsData.write(value, timeoutMs);
   }
 
-  uint8_t M5Waveform::enqueue(point_ts aPoint)
+  uint8_t M5Waveform::enqueue(point_ts aPoint, uint32_t timeoutMs)
   {
-    return _tsData.write(aPoint);
+    return _tsData.write(aPoint, timeoutMs);
   }
 
   void M5Waveform::job()
   {
     m5wf::point_ts aPoint;
-    if (_tsData.read(&aPoint) != 0)
+    if (_tsData.read(&aPoint, 100) != return_codes::OK)
     {
-      delay(100); // TODO: 適切な遅延
+      // delay(100); // TODO: 適切な遅延
       return;
     }
 

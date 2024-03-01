@@ -4,101 +4,97 @@ namespace m5wf
 {
     uint8_t TimeSeriesData::init(uint32_t bufferSize)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-
-        if (_buffer != nullptr)
+        if (_handlerQueue != nullptr)
         {
-            delete[] _buffer;
-            _buffer = nullptr;
+            vQueueDelete(_handlerQueue);
+        }
+
+        _handlerQueue = xQueueCreate(bufferSize, sizeof(point_ts));
+        if (_handlerQueue == nullptr)
+        {
+            return return_codes::NG;
         }
 
         _bufferSize = bufferSize;
-        _buffer = new point_ts[bufferSize];
-        if (_buffer == nullptr)
-        {
-            _bufferSize = 0;
-            return 1;
-        }
 
-        return 0;
+        return return_codes::OK;
     }
 
-    uint8_t TimeSeriesData::write(float aData)
+    uint8_t TimeSeriesData::write(float aData, uint32_t timeoutMs)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-
-        if (_buffer == nullptr)
+        if (_handlerQueue == nullptr)
         {
-            return 1;
+            return return_codes::NG;
         }
 
         _prevRsvTimeMs = _currRsvTimeMs;
-        _currRsvTimeMs = millis();
+        auto now = millis();
         float timeDeltaSec;
-        if (_prevRsvTimeMs <= _currRsvTimeMs)
+        if (_prevRsvTimeMs <= now)
         {
-            timeDeltaSec = (float)(_currRsvTimeMs - _prevRsvTimeMs) / 1000.0;
+            timeDeltaSec = (float)(now - _prevRsvTimeMs) / 1000.0;
         }
         else
         {
-            timeDeltaSec = (float)(UINT32_MAX - _prevRsvTimeMs + _currRsvTimeMs) / 1000.0;
+            // _currRsvTimeMsがオーバーフローして循環した場合
+            timeDeltaSec = (float)(UINT32_MAX - _prevRsvTimeMs + now) / 1000.0;
         }
 
         point_ts aPoint = {timeDeltaSec, aData};
-        _addPointToBuffer(aPoint);
+        auto ret = xQueueSendToBack(_handlerQueue, &aPoint, pdMS_TO_TICKS(timeoutMs));
+        if (ret != pdTRUE)
+        {
+            // Queueが満杯だった場合
+            // 前回Write時刻を更新しない or 0リセット
+            // 前者を採用する
+            return return_codes::NG;
+        }
+        else
+        {
+            _currRsvTimeMs = now;
+        }
 
-        return 0;
+        return return_codes::OK;
     }
 
-    uint8_t TimeSeriesData::write(point_ts aPoint)
+    uint8_t TimeSeriesData::write(point_ts aPoint, uint32_t timeoutMs)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-
-        if (_buffer == nullptr)
+        if (_handlerQueue == nullptr)
         {
-            return 1;
+            return return_codes::NG;
         }
 
-        uint32_t rsvTimeMs = _prevRsvTimeMs + aPoint.timeDeltaSecond * 1000;
-        _prevRsvTimeMs = _currRsvTimeMs;
-        _currRsvTimeMs = rsvTimeMs;
+        auto ret = xQueueSendToBack(_handlerQueue, &aPoint, pdMS_TO_TICKS(timeoutMs));
+        if (ret != pdTRUE)
+        {
+            // Queueが満杯だった場合
+            // 前回Write時刻を更新しない or 0リセット
+            // 前者を採用する
+            return return_codes::NG;
+        }
+        else
+        {
+            uint32_t rsvTimeMs = _prevRsvTimeMs + aPoint.timeDeltaSecond * 1000;
+            _prevRsvTimeMs = _currRsvTimeMs;
+            _currRsvTimeMs = rsvTimeMs;
+        }
 
-        _addPointToBuffer(aPoint);
-
-        return 0;
+        return return_codes::OK;
     }
 
-    uint8_t TimeSeriesData::read(point_ts *readPoint)
+    uint8_t TimeSeriesData::read(point_ts *readPoint, uint32_t timeoutMs)
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-
-        if (_buffer == nullptr || readPoint == nullptr)
+        if (_handlerQueue == nullptr || readPoint == nullptr)
         {
-            return 1;
+            return return_codes::NG;
         }
 
-        if (_rPtr == _wPtr)
+        auto result = xQueueReceive(_handlerQueue, readPoint, pdMS_TO_TICKS(timeoutMs));
+        if (result != pdPASS)
         {
-            return 2;
+            return return_codes::NG;
         }
 
-        *readPoint = _buffer[_rPtr];
-
-        _rPtr++;
-        if (_rPtr >= _bufferSize)
-        {
-            _rPtr = 0;
-        }
-
-        return 0;
-    }
-
-    void TimeSeriesData::_addPointToBuffer(const point_ts &point)
-    {
-        _buffer[_wPtr++] = point;
-        if (_wPtr >= _bufferSize)
-        {
-            _wPtr = 0;
-        }
+        return return_codes::OK;
     }
 }
