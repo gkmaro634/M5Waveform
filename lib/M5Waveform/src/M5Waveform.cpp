@@ -4,12 +4,12 @@ using namespace m5wf::figure_constants;
 
 namespace m5wf
 {
-  uint8_t M5Waveform::startDrawing(uint32_t bufferSize)
+  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, PlotType plotType)
   {
-    return startDrawing(bufferSize, nullptr);
+    return startDrawing(bufferSize, nullptr, plotType);
   }
 
-  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, Callback onDrawing)
+  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, Callback onDrawing, PlotType plotType)
   {
     if (_isDrawing == true)
     {
@@ -26,7 +26,7 @@ namespace m5wf
       _callback = nullptr;
 
       // create queue
-      if(_tsData.init(bufferSize) != return_codes::OK)
+      if (_tsData.init(bufferSize) != return_codes::OK)
       {
         throw "_tsData.init(bufferSize) != return_codes::OK";
       }
@@ -35,7 +35,7 @@ namespace m5wf
       _callback = onDrawing;
 
       // task create
-      uint32_t toAllocSize = 2048;// 暫定
+      uint32_t toAllocSize = 2048; // 暫定
       // uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
       BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
       configASSERT(status == pdPASS);
@@ -44,6 +44,7 @@ namespace m5wf
         throw "status != pdPASS";
       }
 
+      _plotType = plotType;
       _isDrawing = true;
 
       return return_codes::OK;
@@ -104,17 +105,42 @@ namespace m5wf
     if (_hasReachedRightEdge == false)
     {
       // 右端に到達していない場合、左から順番に点を打つ
-      _plotSprite.drawCircle(px, py, MARKER_RADIUS, GREEN);
+      if (_plotType == MARKER || _plotType == LINE_MARKER)
+      {
+        _plotSprite.drawCircle(px, py, MARKER_RADIUS, GREEN);
+      }
+
+      if (_plotType == LINE || _plotType == LINE_MARKER)
+      {
+        int px_p, py_p;
+        _point2px(_prev, &px_p, &py_p);
+        _plotSprite.drawLine(px_p, py_p, px, py, GREEN);
+      }
     }
     else
     {
       // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
       float xStart = _getXAxisStart();
       float dx = _plotRegionWidth / (xEnd - xStart);
-      int_fast16_t xScroll = -dx * aPoint.timeDeltaSecond;
-      _plotSprite.scroll(xScroll, 0);
+      int_fast16_t xScroll = dx * aPoint.timeDeltaSecond;
+      _plotSprite.scroll(-xScroll, 0);
 
-      _plotSprite.drawCircle((int)_plotRegionWidth - MARKER_RADIUS, py, MARKER_RADIUS, GREEN);
+      int xRightEdge = (int)_plotRegionWidth - MARKER_RADIUS;
+
+      if (_plotType == MARKER || _plotType == LINE_MARKER)
+      {
+        _plotSprite.drawCircle(xRightEdge, py, MARKER_RADIUS, GREEN);
+      }
+
+      if (_plotType == LINE || _plotType == LINE_MARKER)
+      {
+        int px_p, py_p;
+        _point2px(_prev, &px_p, &py_p);
+        _plotSprite.drawLine(xRightEdge - (int)xScroll, py_p, xRightEdge, py, GREEN);
+
+        // _display->setCursor(0, 0);
+        // _display->printf("(%d, %d)->(%d, %d)\r\n", xRightEdge - (int)xScroll, py_p, xRightEdge, py);
+      }
     }
 
     _renderFigure();
