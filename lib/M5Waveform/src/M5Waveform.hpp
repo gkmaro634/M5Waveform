@@ -26,12 +26,12 @@ namespace m5wf
       _callback = nullptr;
     }
 
-    uint8_t startDrawing(uint32_t bufferSize);
-    uint8_t startDrawing(uint32_t bufferSize, Callback onDrawing);
+    uint8_t startDrawing(uint32_t bufferSize, PlotType plotType = LINE_MARKER);
+    uint8_t startDrawing(uint32_t bufferSize, Callback onDrawing, PlotType plotType = LINE_MARKER);
     uint8_t stopDrawing();
 
-    uint8_t enqueue(float value);
-    uint8_t enqueue(point_ts aPoint);
+    uint8_t enqueue(float value, uint32_t timeoutMs = 100);
+    uint8_t enqueue(point_ts aPoint, uint32_t timeoutMs = 100);
 
     void job();
 
@@ -44,6 +44,8 @@ namespace m5wf
     point_f _prev;
     point_f _curr;
     bool _hasReachedRightEdge = false;
+
+    PlotType _plotType = LINE_MARKER;
   };
 }
 

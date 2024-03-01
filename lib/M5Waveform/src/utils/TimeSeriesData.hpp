@@ -1,7 +1,6 @@
 #ifndef __TIMESERIESDATA_HPP__
 #define __TIMESERIESDATA_HPP__
 
-#include <mutex>
 #include <time.h>
 #include <M5Unified.h>
 #include "utils/m5wf_common.hpp"
@@ -15,29 +14,23 @@ namespace m5wf
     TimeSeriesData() {}
     ~TimeSeriesData()
     {
-      if (_buffer != nullptr)
+      if (_handlerQueue != NULL)
       {
-        delete[] _buffer;
-        _buffer = nullptr;
+        vQueueDelete(_handlerQueue);
       }
     }
 
     uint8_t init(uint32_t bufferSize);
 
-    uint8_t write(float aData);
-    uint8_t write(point_ts aPoint);
-    uint8_t read(point_ts* readPoint);
+    uint8_t write(float aData, uint32_t timeoutMs = 100);
+    uint8_t write(point_ts aPoint, uint32_t timeoutMs = 100);
+    uint8_t read(point_ts *readPoint, uint32_t timeoutMs = 100);
 
   private:
-    std::mutex _mutex;
+    QueueHandle_t _handlerQueue = nullptr;
     uint32_t _bufferSize = 0;
-    uint32_t _wPtr = 0;
-    uint32_t _rPtr = 0;
-    point_ts *_buffer;
     uint32_t _prevRsvTimeMs;
     uint32_t _currRsvTimeMs;
-
-    void _addPointToBuffer(const point_ts &point);
   };
 }
 

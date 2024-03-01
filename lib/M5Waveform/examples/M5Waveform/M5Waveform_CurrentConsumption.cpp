@@ -25,7 +25,7 @@ void setup()
   wf.init(chartWidth, chartHeight, 4, 3);
   wf.updateXAxisDiv(2);
   wf.updateYAxisDiv(20);
-  wf.startDrawing(8, onDrawingCallback);
+  wf.startDrawing(8, onDrawingCallback, m5wf::LINE);
 
   display.fillScreen(BLACK);
 }

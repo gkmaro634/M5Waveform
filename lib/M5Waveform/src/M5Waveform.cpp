@@ -4,65 +4,63 @@ using namespace m5wf::figure_constants;
 
 namespace m5wf
 {
-  uint8_t M5Waveform::startDrawing(uint32_t bufferSize)
+  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, PlotType plotType)
   {
-    return startDrawing(bufferSize, nullptr);
+    return startDrawing(bufferSize, nullptr, plotType);
   }
 
-  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, Callback onDrawing)
+  uint8_t M5Waveform::startDrawing(uint32_t bufferSize, Callback onDrawing, PlotType plotType)
   {
     if (_isDrawing == true)
     {
-      return 1;
+      return return_codes::NG;
     }
 
-    // _bufferSize = 0;
-    if (_tsData.init(bufferSize) != 0)
+    try
     {
-      return 1;
+      // delete unexpected handler
+      if (_handleDrawingTask != nullptr)
+      {
+        vTaskDelete(_handleDrawingTask);
+      }
+      _callback = nullptr;
+
+      // create queue
+      if (_tsData.init(bufferSize) != return_codes::OK)
+      {
+        throw "_tsData.init(bufferSize) != return_codes::OK";
+      }
+
+      // set callback
+      _callback = onDrawing;
+
+      // task create
+      uint32_t toAllocSize = 2048; // 暫定
+      // uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
+      BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
+      configASSERT(status == pdPASS);
+      if (status != pdPASS)
+      {
+        throw "status != pdPASS";
+      }
+
+      _plotType = plotType;
+      _isDrawing = true;
+
+      return return_codes::OK;
     }
-
-    // if (_points != nullptr)
-    // {
-    //   delete[] _points;
-    //   _points = nullptr;
-    // }
-
-    // _points = new point_f[bufferSize];
-    // if (_points == nullptr)
-    // {
-    //   return 1;
-    // }
-    // _bufferSize = bufferSize;
-
-    if (_handleDrawingTask != nullptr)
-    {
-      vTaskDelete(_handleDrawingTask);
-    }
-
-    // set callback
-    _callback = onDrawing;
-
-    // task create
-    uint32_t toAllocSize = sizeof(point_f) * _plotRegionWidth + 1024; // 描画対象点のキャッシュ＋処理に必要と思われる領域の予備
-    BaseType_t status = xTaskCreatePinnedToCore(_drawingTask, "drawingTask", toAllocSize, this, 1, &_handleDrawingTask, 1);
-    configASSERT(status == pdPASS);
-    if (status != pdPASS)
+    catch (const std::exception &e)
     {
       _callback = nullptr;
-      return 1;
+      return return_codes::NG;
     }
-    
-    _isDrawing = true;
-
-    return 0;
   }
 
   uint8_t M5Waveform::stopDrawing()
   {
     if (_isDrawing == false)
     {
-      return 1;
+      return return_codes::NG;
     }
     _isDrawing = false;
 
@@ -72,25 +70,25 @@ namespace m5wf
       vTaskDelete(_handleDrawingTask);
     }
 
-    return 0;
+    return return_codes::OK;
   }
 
-  uint8_t M5Waveform::enqueue(float value)
+  uint8_t M5Waveform::enqueue(float value, uint32_t timeoutMs)
   {
-    return _tsData.write(value);
+    return _tsData.write(value, timeoutMs);
   }
 
-  uint8_t M5Waveform::enqueue(point_ts aPoint)
+  uint8_t M5Waveform::enqueue(point_ts aPoint, uint32_t timeoutMs)
   {
-    return _tsData.write(aPoint);
+    return _tsData.write(aPoint, timeoutMs);
   }
 
   void M5Waveform::job()
   {
     m5wf::point_ts aPoint;
-    if (_tsData.read(&aPoint) != 0)
+    if (_tsData.read(&aPoint, 100) != return_codes::OK)
     {
-      delay(100); // TODO: 適切な遅延
+      // delay(100); // TODO: 適切な遅延
       return;
     }
 
@@ -107,17 +105,42 @@ namespace m5wf
     if (_hasReachedRightEdge == false)
     {
       // 右端に到達していない場合、左から順番に点を打つ
-      _plotSprite.drawCircle(px, py, MARKER_RADIUS, GREEN);
+      if (_plotType == MARKER || _plotType == LINE_MARKER)
+      {
+        _plotSprite.drawCircle(px, py, MARKER_RADIUS, GREEN);
+      }
+
+      if (_plotType == LINE || _plotType == LINE_MARKER)
+      {
+        int px_p, py_p;
+        _point2px(_prev, &px_p, &py_p);
+        _plotSprite.drawLine(px_p, py_p, px, py, GREEN);
+      }
     }
     else
     {
       // 右端に到達したらX差分の分スプライトをシフトし、点を打つ
       float xStart = _getXAxisStart();
       float dx = _plotRegionWidth / (xEnd - xStart);
-      int_fast16_t xScroll = -dx * aPoint.timeDeltaSecond;
-      _plotSprite.scroll(xScroll, 0);
+      int_fast16_t xScroll = dx * aPoint.timeDeltaSecond;
+      _plotSprite.scroll(-xScroll, 0);
 
-      _plotSprite.drawCircle((int)_plotRegionWidth - MARKER_RADIUS, py, MARKER_RADIUS, GREEN);
+      int xRightEdge = (int)_plotRegionWidth - MARKER_RADIUS;
+
+      if (_plotType == MARKER || _plotType == LINE_MARKER)
+      {
+        _plotSprite.drawCircle(xRightEdge, py, MARKER_RADIUS, GREEN);
+      }
+
+      if (_plotType == LINE || _plotType == LINE_MARKER)
+      {
+        int px_p, py_p;
+        _point2px(_prev, &px_p, &py_p);
+        _plotSprite.drawLine(xRightEdge - (int)xScroll, py_p, xRightEdge, py, GREEN);
+
+        // _display->setCursor(0, 0);
+        // _display->printf("(%d, %d)->(%d, %d)\r\n", xRightEdge - (int)xScroll, py_p, xRightEdge, py);
+      }
     }
 
     _renderFigure();
