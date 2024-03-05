@@ -16,8 +16,7 @@ M5Stack用波形表示ライブラリです。
 - 線のみ
 - マーカーと線
 
-![m5waveform_demo](https://github.com/gkmaro634/M5Waveform/assets/18242610/7c93cb7d-5b6f-47af-9e7b-40d45bf019c1)
-
+![m5waveform_demo](https://github.com/gkmaro634/M5Waveform/assets/18242610/b68a5f47-f3ae-4da9-9a33-ac9f2207b62e)
 
 ## オフライン波形表示(M5Plotクラス)
 ### 動作概要
